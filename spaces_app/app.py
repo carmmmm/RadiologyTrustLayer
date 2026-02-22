@@ -733,6 +733,34 @@ button.secondary {
     white-space: nowrap;
 }
 
+/* Pipeline step buttons on landing page */
+.rtl-pipeline-step-btn {
+    background: #fff !important;
+    border: 1.5px solid #dadce0 !important;
+    border-radius: 14px !important;
+    padding: 10px 14px !important;
+    font-size: 0.82rem !important;
+    color: #202124 !important;
+    font-weight: 500 !important;
+    text-align: left !important;
+    box-shadow: none !important;
+    cursor: pointer !important;
+    margin-bottom: 4px !important;
+}
+.rtl-pipeline-step-btn:hover {
+    border-color: #1a73e8 !important;
+    box-shadow: 0 1px 4px rgba(26,115,232,0.12) !important;
+}
+.rtl-step-info {
+    font-size: 0.82rem !important;
+    color: #5f6368 !important;
+    padding: 8px 14px !important;
+    background: #f8fbff !important;
+    border-left: 3px solid #1a73e8 !important;
+    border-radius: 0 8px 8px 0 !important;
+    margin-top: 4px !important;
+}
+
 /* Dummy history overlay */
 .rtl-history-placeholder {
     position: relative;
@@ -864,13 +892,37 @@ def _page_info_html(page: str) -> str:
     return f'<div class="rtl-nav-page-info"><span class="rtl-page-name">{name}</span> {desc}</div>'
 
 
+# Map page names to which nav button index (0-based) should be highlighted
+# Order: RTL(landing), Demo, Single, Batch, History, Evaluation, Settings
+_NAV_ACTIVE = {
+    "landing": 0,
+    "single": 2,
+    "batch": 3,
+    "history": 4,
+    "evaluation": 5,
+    "settings": 6,
+    "home": 0,
+    "detail": 2,
+}
+_NAV_COUNT = 7  # RTL, Demo, Single Audit, Batch, History, Evaluation, Settings
+
+
+def _nav_btn_updates(page: str) -> tuple:
+    """Return gr.update for each of the 7 nav buttons — active one gets variant='primary'."""
+    active_idx = _NAV_ACTIVE.get(page, -1)
+    return tuple(
+        gr.update(variant="primary") if i == active_idx else gr.update(variant="secondary")
+        for i in range(_NAV_COUNT)
+    )
+
+
 def _set_views(page: str) -> tuple:
-    """Return gr.update() for nav_group + nav_page_info + each view in PAGES order."""
-    nav_visible = page not in ("landing", "login")
+    """Return gr.update() for nav_group + nav_page_info + nav_buttons + each view in PAGES order."""
+    nav_visible = page != "login"
     return (
         gr.update(visible=nav_visible),
         gr.update(value=_page_info_html(page)),
-    ) + tuple(
+    ) + _nav_btn_updates(page) + tuple(
         gr.update(visible=(page == p)) for p in PAGES
     )
 
@@ -989,114 +1041,60 @@ def main() -> gr.Blocks:
         # ═══════════════════════════════════════════════════════════════════
         landing_view = gr.Group(visible=True)
         with landing_view:
-            gr.HTML(f'''
-            <div class="rtl-landing">
-              <div class="rtl-landing-header">
-                <span class="rtl-landing-brand">Med<strong>Gemma</strong></span>
-              </div>
-
-              <div class="rtl-landing-content">
-                <!-- LEFT: Architecture Diagram -->
-                <div class="rtl-landing-diagram">
-                  <div class="rtl-model-callout">
-                    <div class="rtl-model-callout-icon">MG</div>
-                    <div class="rtl-model-callout-text">
-                      <strong>MedGemma 4B + RTL LoRA</strong>
-                      Open-weight medical AI with custom fine-tuning
-                    </div>
-                  </div>
-
-                  <div class="rtl-pipeline-label">6-Step Audit Pipeline</div>
-                  <div class="rtl-pipeline-label" style="font-size:0.72rem;font-weight:400;color:#9aa0a6;margin-top:-8px;">Click a step to learn more</div>
-                  <div class="rtl-pipeline-steps">
-                    <div class="rtl-pipeline-step" onclick="this.classList.toggle('active')">
-                      <span class="rtl-step-num">1</span> Claim Extraction
-                      <div class="rtl-step-desc">Parses the radiology report into individual clinical claims (e.g. &ldquo;No pleural effusion&rdquo;). Each claim becomes a unit that can be independently verified against the image.</div>
-                    </div>
-                    <div class="rtl-pipeline-connector"></div>
-                    <div class="rtl-pipeline-step" onclick="this.classList.toggle('active')">
-                      <span class="rtl-step-num">2</span> Image Findings
-                      <div class="rtl-step-desc">MedGemma analyzes the radiology image and generates a structured list of visual findings &mdash; what is actually visible in the scan, independent of the report.</div>
-                    </div>
-                    <div class="rtl-pipeline-connector"></div>
-                    <div class="rtl-pipeline-step" onclick="this.classList.toggle('active')">
-                      <span class="rtl-step-num">3</span> Alignment
-                      <div class="rtl-step-desc">Each extracted claim is compared against the image findings and labeled: <em>supported</em>, <em>uncertain</em>, <em>not assessable</em>, or <em>needs review</em>.</div>
-                    </div>
-                    <div class="rtl-pipeline-connector"></div>
-                    <div class="rtl-pipeline-step" onclick="this.classList.toggle('active')">
-                      <span class="rtl-step-num">4</span> Scoring
-                      <div class="rtl-step-desc">Computes a 0&ndash;100 safety score based on alignment labels. Supported claims score high; uncertain and flagged claims reduce the score proportionally.</div>
-                    </div>
-                    <div class="rtl-pipeline-connector"></div>
-                    <div class="rtl-pipeline-step" onclick="this.classList.toggle('active')">
-                      <span class="rtl-step-num">5</span> Rewrite Suggestions
-                      <div class="rtl-step-desc">Generates alternative phrasing for uncertain or flagged claims using calibrated uncertainty language (e.g. &ldquo;may represent&rdquo; instead of &ldquo;consistent with&rdquo;).</div>
-                    </div>
-                    <div class="rtl-pipeline-connector"></div>
-                    <div class="rtl-pipeline-step" onclick="this.classList.toggle('active')">
-                      <span class="rtl-step-num">6</span> Clinician Summary
-                      <div class="rtl-step-desc">Produces an actionable summary for radiologists highlighting key concerns, plus a plain-language patient explanation of the findings.</div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- RIGHT: Text content -->
-                <div class="rtl-landing-text">
-                  <h1>Radiology Trust Layer</h1>
-
-                  <p>A MedGemma-powered auditing system that checks whether radiology
-                  reports are faithfully supported by imaging evidence. RTL surfaces
-                  where language is well-supported, uncertain, or potentially misleading
-                  &mdash; without generating diagnoses.</p>
-
-                  <p>Every claim in a radiology report is extracted, checked against
-                  visual findings from the image, and given a trust label. Flagged
-                  claims receive suggested rewrites with calibrated uncertainty language.
-                  Clinicians get an actionable summary; patients get a plain-language
-                  explanation.</p>
-                </div>
-              </div>
-            </div>
-            ''')
+            gr.Markdown("# Radiology Trust Layer")
+            gr.Markdown(
+                "A MedGemma-powered auditing system that checks whether radiology "
+                "reports are faithfully supported by imaging evidence. RTL surfaces "
+                "where language is well-supported, uncertain, or potentially misleading "
+                "— without generating diagnoses."
+            )
             with gr.Row(elem_classes=["rtl-landing-cta-row"]):
                 landing_cta = gr.Button("Try Demo", elem_classes=["rtl-cta-btn"])
                 landing_login = gr.Button("Log In", elem_classes=["rtl-cta-secondary"])
-            gr.HTML('''
-            <div class="rtl-landing" style="padding-top:0;min-height:auto;">
-              <div class="rtl-metrics-strip">
-                <div class="rtl-metric-item">
-                  <div class="rtl-metric-value">96%</div>
-                  <div class="rtl-metric-label">JSON Schema<br>Compliance</div>
-                </div>
-                <div class="rtl-metric-item">
-                  <div class="rtl-metric-value">89%</div>
-                  <div class="rtl-metric-label">Label<br>Accuracy</div>
-                </div>
-                <div class="rtl-metric-item">
-                  <div class="rtl-metric-value">6</div>
-                  <div class="rtl-metric-label">Pipeline<br>Steps</div>
-                </div>
-                <div class="rtl-metric-item">
-                  <div class="rtl-metric-value">4B</div>
-                  <div class="rtl-metric-label">Model<br>Parameters</div>
-                </div>
-              </div>
 
-              <div class="rtl-landing-disclaimer">
-                <span class="rtl-disclaimer-badge">Disclaimer</span>
-                This is a research demonstration for the MedGemma Impact Challenge.
-                It is not intended for clinical use. Do not upload real patient data.
-                All example cases use public chest X-ray images from the
-                <a href="https://huggingface.co/datasets/hf-vision/chest-xray-pneumonia" target="_blank" style="color:#1a73e8;">chest-xray-pneumonia</a> dataset.
-              </div>
-              <div style="margin-top:12px;font-size:0.78rem;color:#9aa0a6;line-height:1.6;">
-                Metrics measured on 50 synthetic radiology cases comparing MedGemma-4B-IT base vs. RTL LoRA adapter.
-                96% JSON schema compliance and 89% label accuracy are post-LoRA results.
-                See the <strong>Evaluation</strong> tab for full before/after breakdown.
-              </div>
-            </div>
-            ''')
+            with gr.Row():
+                with gr.Column(scale=1):
+                    gr.HTML('''<div style="padding:14px 16px;background:linear-gradient(135deg,#e8f0fe,#f8f9fa);border:1.5px solid #d2e3fc;border-radius:20px;display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+<div style="width:40px;height:40px;border-radius:12px;background:#202124;display:flex;align-items:center;justify-content:center;color:white;font-weight:700;font-size:0.75rem;flex-shrink:0;">MG</div>
+<div style="font-size:0.8rem;color:#3c4043;line-height:1.4;"><strong style="color:#202124;display:block;font-size:0.9rem;">MedGemma 4B + RTL LoRA</strong>Open-weight medical AI with custom fine-tuning</div>
+</div>''')
+                    gr.HTML('''<div style="font-size:0.8rem;font-weight:600;color:#5f6368;text-transform:uppercase;letter-spacing:0.05em;margin-bottom:12px;">6-Step Audit Pipeline</div>''')
+                    landing_step_btns = []
+                    _step_names = [
+                        "1. Claim Extraction",
+                        "2. Image Findings",
+                        "3. Alignment",
+                        "4. Scoring",
+                        "5. Rewrite Suggestions",
+                        "6. Clinician Summary",
+                    ]
+                    for _sname in _step_names:
+                        _sbtn = gr.Button(_sname, size="sm", elem_classes=["rtl-pipeline-step-btn"])
+                        landing_step_btns.append(_sbtn)
+                    landing_step_info = gr.Markdown("*Click a step above to learn more.*", elem_classes=["rtl-step-info"])
+
+                with gr.Column(scale=2):
+                    gr.Markdown(
+                        "Every claim in a radiology report is extracted, checked against "
+                        "visual findings from the image, and given a trust label. Flagged "
+                        "claims receive suggested rewrites with calibrated uncertainty language. "
+                        "Clinicians get an actionable summary; patients get a plain-language explanation."
+                    )
+                    gr.HTML('''<div style="display:flex;gap:32px;margin:20px 0;padding:20px 0;border-top:1px solid #e0e0e0;border-bottom:1px solid #e0e0e0;">
+<div style="text-align:center;flex:1;"><div style="font-size:1.6rem;font-weight:600;color:#202124;">96%</div><div style="font-size:0.72rem;color:#5f6368;margin-top:6px;">JSON Schema<br>Compliance</div></div>
+<div style="text-align:center;flex:1;"><div style="font-size:1.6rem;font-weight:600;color:#202124;">89%</div><div style="font-size:0.72rem;color:#5f6368;margin-top:6px;">Label<br>Accuracy</div></div>
+<div style="text-align:center;flex:1;"><div style="font-size:1.6rem;font-weight:600;color:#202124;">6</div><div style="font-size:0.72rem;color:#5f6368;margin-top:6px;">Pipeline<br>Steps</div></div>
+<div style="text-align:center;flex:1;"><div style="font-size:1.6rem;font-weight:600;color:#202124;">4B</div><div style="font-size:0.72rem;color:#5f6368;margin-top:6px;">Model<br>Parameters</div></div>
+</div>''')
+                    gr.Markdown(
+                        "> **Disclaimer** — This is a research demonstration for the MedGemma Impact Challenge. "
+                        "Not intended for clinical use. Do not upload real patient data. "
+                        "Example cases use public chest X-ray images from the "
+                        "[chest-xray-pneumonia](https://huggingface.co/datasets/hf-vision/chest-xray-pneumonia) dataset.\n\n"
+                        "*Metrics measured on 50 synthetic radiology cases comparing MedGemma-4B-IT base vs. RTL LoRA adapter. "
+                        "96% JSON schema compliance and 89% label accuracy are post-LoRA results. "
+                        "See the Evaluation tab for full before/after breakdown.*"
+                    )
 
         # ═══════════════════════════════════════════════════════════════════
         # LOGIN VIEW
@@ -1158,24 +1156,6 @@ def main() -> gr.Blocks:
                 "Upload a radiology image and paste the corresponding report. "
                 "RTL audits each claim against imaging evidence using MedGemma."
             )
-
-            # Demo section — clickable cards
-            if EXAMPLE_CASES:
-                gr.HTML('''<div style="margin:8px 0 4px 0;">
-                    <span style="font-weight:600;color:#202124;">Try an example case</span>
-                    <span style="color:#5f6368;font-size:0.875rem;margin-left:8px;">Click a card to load it</span>
-                </div>''')
-                with gr.Row(equal_height=True):
-                    _demo_btns = []
-                    for _i, _ex in enumerate(EXAMPLE_CASES[:3]):
-                        _sev = _ex.get("expected_severity", "low")
-                        _notes = _ex.get("notes", "")
-                        _btn_label = f"{_ex['label']}\n{_notes}\nExpected: {_sev} severity"
-                        _btn = gr.Button(_btn_label, elem_classes=["rtl-demo-card-btn"])
-                        _demo_btns.append(_btn)
-                    demo_btn_1 = _demo_btns[0] if len(_demo_btns) > 0 else None
-                    demo_btn_2 = _demo_btns[1] if len(_demo_btns) > 1 else None
-                    demo_btn_3 = _demo_btns[2] if len(_demo_btns) > 2 else None
 
             with gr.Row():
                 with gr.Column(scale=1):
@@ -1596,7 +1576,8 @@ Always consult qualified radiologists for medical decisions.
         # ═══════════════════════════════════════════════════════════════════
 
         # Shared output list: state + nav_group + all page views + home_header + recent_table
-        _shared_nav_outputs = [state, nav_group, nav_page_info] + all_views + [home_header, recent_table]
+        _nav_buttons = [nav_home_btn, nav_demo, nav_single, nav_batch, nav_history, nav_eval, nav_settings]
+        _shared_nav_outputs = [state, nav_group, nav_page_info] + _nav_buttons + all_views + [home_header, recent_table]
 
         # Detail component list
         _detail_comps = [
@@ -1670,29 +1651,49 @@ Always consult qualified radiologists for medical decisions.
         login_btn.click(
             do_login,
             inputs=[login_email, login_pw, state],
-            outputs=[state, login_msg, nav_group, nav_page_info] + all_views + [home_header, recent_table],
+            outputs=[state, login_msg, nav_group, nav_page_info] + _nav_buttons + all_views + [home_header, recent_table],
         )
         create_btn.click(
             do_create,
             inputs=[create_email, create_name_box, create_pw, state],
-            outputs=[state, create_msg, nav_group, nav_page_info] + all_views + [home_header, recent_table],
+            outputs=[state, create_msg, nav_group, nav_page_info] + _nav_buttons + all_views + [home_header, recent_table],
         )
 
         # Open detail from home / history
         home_open_btn.click(
             lambda run_id, st: (st,) + _set_views("detail") + _load_detail(run_id.strip()),
             inputs=[home_run_id_box, state],
-            outputs=[state, nav_group, nav_page_info] + all_views + _detail_comps,
+            outputs=[state, nav_group, nav_page_info] + _nav_buttons + all_views + _detail_comps,
         )
         hist_open_btn.click(
             lambda run_id, st: (st,) + _set_views("detail") + _load_detail(run_id.strip()),
             inputs=[hist_run_id_box, state],
-            outputs=[state, nav_group, nav_page_info] + all_views + _detail_comps,
+            outputs=[state, nav_group, nav_page_info] + _nav_buttons + all_views + _detail_comps,
         )
 
         # Landing page buttons
-        landing_cta.click(lambda st: go_to("single", st), inputs=[state], outputs=_shared_nav_outputs)
+        def _try_demo(st):
+            nav_out = go_to("single", st)
+            img, label, report = _load_example_case(0)
+            return nav_out + (img, label, report)
+        landing_cta.click(
+            _try_demo, inputs=[state],
+            outputs=_shared_nav_outputs + [single_image, single_case_label, single_report],
+        )
         landing_login.click(lambda st: go_to("login", st), inputs=[state], outputs=_shared_nav_outputs)
+
+        # Pipeline step descriptions
+        _step_descs = [
+            "**Step 1 — Claim Extraction:** Parses the radiology report into individual clinical claims (e.g. \"No pleural effusion\"). Each claim becomes a unit that can be independently verified against the image.",
+            "**Step 2 — Image Findings:** MedGemma analyzes the radiology image and generates a structured list of visual findings — what is actually visible in the scan, independent of the report.",
+            "**Step 3 — Alignment:** Each extracted claim is compared against the image findings and labeled: *supported*, *uncertain*, *not assessable*, or *needs review*.",
+            "**Step 4 — Scoring:** Computes a 0–100 safety score based on alignment labels. Supported claims score high; uncertain and flagged claims reduce the score proportionally.",
+            "**Step 5 — Rewrite Suggestions:** Generates alternative phrasing for uncertain or flagged claims using calibrated uncertainty language (e.g. \"may represent\" instead of \"consistent with\").",
+            "**Step 6 — Clinician Summary:** Produces an actionable summary for radiologists highlighting key concerns, plus a plain-language patient explanation of the findings.",
+        ]
+        for i, sbtn in enumerate(landing_step_btns):
+            desc = _step_descs[i]
+            sbtn.click(lambda d=desc: d, outputs=[landing_step_info])
 
         # Navigation — persistent nav bar
         nav_home_btn.click(lambda st: go_to("landing", st), inputs=[state], outputs=_shared_nav_outputs)
@@ -1715,21 +1716,6 @@ Always consult qualified radiologists for medical decisions.
             ],
         )
         single_accept_all.click(accept_all_rewrites, inputs=[state], outputs=[single_edited_report])
-
-        # Demo buttons
-        if EXAMPLE_CASES:
-            demo_btn_1.click(
-                lambda: _load_example_case(0),
-                outputs=[single_image, single_case_label, single_report],
-            )
-            demo_btn_2.click(
-                lambda: _load_example_case(1),
-                outputs=[single_image, single_case_label, single_report],
-            )
-            demo_btn_3.click(
-                lambda: _load_example_case(2),
-                outputs=[single_image, single_case_label, single_report],
-            )
 
         # Batch audit
         batch_run_btn.click(
@@ -1757,7 +1743,7 @@ Always consult qualified radiologists for medical decisions.
         demo.load(
             lambda st: (st,) + _set_views(st.get("page", "landing")) + ("", []),
             inputs=[state],
-            outputs=[state, nav_group, nav_page_info] + all_views + [home_header, recent_table],
+            outputs=[state, nav_group, nav_page_info] + _nav_buttons + all_views + [home_header, recent_table],
         )
 
     return demo
