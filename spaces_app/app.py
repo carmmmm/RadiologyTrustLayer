@@ -43,16 +43,18 @@ STORAGE_DIR = config.STORAGE_DIR
 DB_PATH = config.DB_PATH
 SCHEMA_PATH = _ROOT / "core" / "db" / "schema.sql"
 
-PAGES = ["login", "home", "single", "batch", "detail", "history", "evaluation", "settings"]
+PAGES = ["landing", "login", "home", "single", "batch", "detail", "history", "evaluation", "settings"]
 
 
 # ─────────────────────────── CSS Design System ───────────────────────────────
 
 RTL_CSS = """
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 /* Google-style design system for RTL */
 
 .gradio-container {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
     max-width: 1200px !important;
     margin: 0 auto !important;
 }
@@ -93,13 +95,26 @@ RTL_CSS = """
 
 /* Typography */
 .gradio-container h1, .gradio-container h2, .gradio-container h3 {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
     color: #202124 !important;
     letter-spacing: -0.01em;
 }
 .gradio-container h2 {
     font-size: 1.375rem !important;
     font-weight: 500 !important;
+}
+
+/* Fix code blocks visibility (dark-on-dark bug) */
+.gradio-container code {
+    background: #f1f3f4 !important;
+    color: #202124 !important;
+    padding: 2px 6px !important;
+    border-radius: 4px !important;
+    font-size: 0.85em !important;
+}
+.gradio-container pre code {
+    padding: 12px !important;
+    display: block !important;
 }
 
 /* Primary buttons */
@@ -412,6 +427,306 @@ button.secondary {
     font-weight: 600 !important;
     margin-left: auto !important;
 }
+
+/* ── Landing Page ────────────────────────────────────────────────────── */
+
+.rtl-landing {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 20px 0 20px;
+    min-height: 80vh;
+}
+
+.rtl-landing-header {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 0 0 32px 0;
+}
+
+.rtl-landing-brand {
+    font-size: 1.1rem;
+    color: #5f6368;
+    letter-spacing: 0.02em;
+}
+.rtl-landing-brand strong {
+    color: #202124;
+    font-weight: 600;
+}
+
+.rtl-landing-content {
+    display: flex;
+    gap: 72px;
+    align-items: flex-start;
+    padding: 0 2%;
+}
+
+.rtl-landing-diagram {
+    flex: 0 0 320px;
+}
+
+.rtl-landing-text {
+    flex: 1;
+    min-width: 0;
+}
+
+.rtl-landing-text h1 {
+    font-size: 2.5rem !important;
+    font-weight: 400 !important;
+    color: #202124 !important;
+    margin: 0 0 20px 0 !important;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+}
+
+.rtl-landing-text p {
+    color: #3c4043;
+    line-height: 1.8;
+    font-size: 0.95rem;
+    margin-bottom: 16px;
+}
+
+/* Pipeline Architecture Diagram */
+.rtl-model-callout {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    background: linear-gradient(135deg, #e8f0fe, #f8f9fa);
+    border: 1.5px solid #d2e3fc;
+    border-radius: 20px;
+    margin-bottom: 20px;
+}
+.rtl-model-callout-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    background: #202124;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 700;
+    font-size: 0.75rem;
+    flex-shrink: 0;
+}
+.rtl-model-callout-text {
+    font-size: 0.8rem;
+    color: #3c4043;
+    line-height: 1.4;
+}
+.rtl-model-callout-text strong {
+    color: #202124;
+    display: block;
+    font-size: 0.9rem;
+}
+
+.rtl-pipeline-label {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: #5f6368;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+}
+
+.rtl-pipeline-steps {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.rtl-pipeline-step {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 14px;
+    background: #fff;
+    border: 1.5px solid #dadce0;
+    border-radius: 14px;
+    font-size: 0.82rem;
+    color: #202124;
+    font-weight: 500;
+}
+.rtl-pipeline-step:hover {
+    border-color: #1a73e8;
+    box-shadow: 0 1px 4px rgba(26,115,232,0.12);
+}
+
+.rtl-step-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: #202124;
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+
+.rtl-pipeline-connector {
+    width: 2px;
+    height: 6px;
+    background: #dadce0;
+    margin-left: 25px;
+}
+
+/* Metrics Strip */
+.rtl-metrics-strip {
+    display: flex;
+    gap: 32px;
+    margin: 28px 0;
+    padding: 20px 0;
+    border-top: 1px solid #e0e0e0;
+    border-bottom: 1px solid #e0e0e0;
+}
+.rtl-metric-item { text-align: center; flex: 1; }
+.rtl-metric-value {
+    font-size: 1.6rem;
+    font-weight: 600;
+    color: #202124;
+    line-height: 1;
+}
+.rtl-metric-label {
+    font-size: 0.72rem;
+    color: #5f6368;
+    margin-top: 6px;
+    line-height: 1.3;
+}
+
+/* Disclaimer Badge */
+.rtl-landing-disclaimer {
+    margin: 24px 0 0 0;
+    font-size: 0.85rem;
+    line-height: 1.7;
+    color: #5f6368;
+}
+.rtl-disclaimer-badge {
+    background-color: #5f6368;
+    color: white;
+    padding: 3px 14px;
+    border-radius: 16px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    white-space: nowrap;
+    margin-right: 6px;
+    display: inline-block;
+    transform: translateY(-1px);
+}
+
+/* CTA Button Row */
+.rtl-landing-cta-row {
+    justify-content: center !important;
+    gap: 12px !important;
+    padding: 32px 0 40px 0 !important;
+}
+.rtl-cta-btn {
+    background-color: #202124 !important;
+    color: white !important;
+    padding: 12px 32px !important;
+    border: none !important;
+    border-radius: 25px !important;
+    font-size: 1rem !important;
+    font-weight: 500 !important;
+    box-shadow: none !important;
+    min-width: 160px !important;
+    cursor: pointer !important;
+}
+.rtl-cta-btn:hover {
+    background-color: #3c4043 !important;
+}
+.rtl-cta-secondary {
+    background: none !important;
+    border: 1.5px solid #dadce0 !important;
+    border-radius: 25px !important;
+    padding: 12px 28px !important;
+    font-size: 1rem !important;
+    font-weight: 500 !important;
+    color: #202124 !important;
+    box-shadow: none !important;
+    cursor: pointer !important;
+}
+.rtl-cta-secondary:hover {
+    background: #f8f9fa !important;
+}
+
+/* Slim Nav Bar (v2) */
+.rtl-nav-bar-v2 {
+    display: flex !important;
+    align-items: center !important;
+    gap: 2px !important;
+    padding: 8px 12px !important;
+    background: transparent !important;
+    border-bottom: 1px solid #e0e0e0 !important;
+    border-radius: 0 !important;
+    margin-bottom: 16px !important;
+}
+.rtl-nav-bar-v2 button {
+    background: none !important;
+    border: none !important;
+    border-radius: 6px !important;
+    padding: 6px 14px !important;
+    font-size: 0.85rem !important;
+    font-weight: 500 !important;
+    color: #5f6368 !important;
+    cursor: pointer !important;
+    box-shadow: none !important;
+    min-width: auto !important;
+}
+.rtl-nav-bar-v2 button:hover {
+    background: #f1f3f4 !important;
+    color: #202124 !important;
+}
+.rtl-nav-logo {
+    font-size: 1rem !important;
+    font-weight: 600 !important;
+    color: #202124 !important;
+    border-right: 1px solid #e0e0e0 !important;
+    margin-right: 6px !important;
+    padding-right: 14px !important;
+}
+
+/* Nav page info bar */
+.rtl-nav-page-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 16px 12px 16px;
+    font-size: 0.82rem;
+    color: #5f6368;
+    line-height: 1.4;
+}
+.rtl-nav-page-info .rtl-page-name {
+    font-weight: 600;
+    color: #1a73e8;
+    background: #e8f0fe;
+    padding: 3px 12px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    white-space: nowrap;
+}
+
+/* Mobile */
+@media (max-width: 768px) {
+    .rtl-landing-content {
+        flex-direction: column;
+        gap: 32px;
+    }
+    .rtl-landing-diagram {
+        flex: none;
+        width: 100%;
+    }
+    .rtl-landing-text h1 {
+        font-size: 1.8rem !important;
+    }
+    .rtl-metrics-strip {
+        flex-wrap: wrap;
+        gap: 16px;
+    }
+}
 """
 
 
@@ -469,13 +784,37 @@ def _default_state() -> dict:
         "run_id": None,
         "batch_id": None,
         "current_result": None,
-        "page": "single",
+        "page": "landing",
     }
 
 
+PAGE_DESCRIPTIONS = {
+    "landing": ("Demo", "Overview of the Radiology Trust Layer and its 6-step audit pipeline"),
+    "single": ("Single Audit", "Upload a radiology image and report to run the full audit pipeline"),
+    "batch": ("Batch", "Upload a ZIP archive of cases for bulk processing"),
+    "history": ("History", "Browse and filter past audits (requires login)"),
+    "evaluation": ("Evaluation", "Model card, LoRA before/after metrics, and example outputs"),
+    "settings": ("Settings", "Current configuration and environment variables"),
+    "detail": ("Audit Detail", "Full results for a single audit run"),
+    "home": ("Home", "Recent audits and account overview"),
+    "login": ("", ""),
+}
+
+
+def _page_info_html(page: str) -> str:
+    name, desc = PAGE_DESCRIPTIONS.get(page, ("", ""))
+    if not name:
+        return ""
+    return f'<div class="rtl-nav-page-info"><span class="rtl-page-name">{name}</span> {desc}</div>'
+
+
 def _set_views(page: str) -> tuple:
-    """Return gr.update() for nav_group + each view in PAGES order."""
-    return (gr.update(visible=True),) + tuple(
+    """Return gr.update() for nav_group + nav_page_info + each view in PAGES order."""
+    nav_visible = page not in ("landing", "login")
+    return (
+        gr.update(visible=nav_visible),
+        gr.update(value=_page_info_html(page)),
+    ) + tuple(
         gr.update(visible=(page == p)) for p in PAGES
     )
 
@@ -525,10 +864,11 @@ def main() -> gr.Blocks:
         # ═══════════════════════════════════════════════════════════════════
         # PERSISTENT NAVIGATION BAR (hidden on login page)
         # ═══════════════════════════════════════════════════════════════════
-        nav_group = gr.Group(visible=True)
+        nav_group = gr.Group(visible=False)
         with nav_group:
-            with gr.Row(elem_classes=["rtl-nav-bar"]):
-                gr.HTML('<span style="font-size:1.1rem;font-weight:600;color:#202124;padding:0 16px 0 8px;border-right:1px solid #dadce0;margin-right:8px;">RTL</span>')
+            with gr.Row(elem_classes=["rtl-nav-bar-v2"]):
+                nav_home_btn = gr.Button("RTL", size="sm", elem_classes=["rtl-nav-logo"])
+                nav_demo = gr.Button("Demo", size="sm")
                 nav_single = gr.Button("Single Audit", size="sm")
                 nav_batch = gr.Button("Batch", size="sm")
                 nav_history = gr.Button("History", size="sm")
@@ -536,6 +876,93 @@ def main() -> gr.Blocks:
                 nav_settings = gr.Button("Settings", size="sm")
                 gr.HTML('<span style="flex:1;"></span>')
                 nav_login = gr.Button("Log in", size="sm", elem_classes=["rtl-nav-login"])
+            nav_page_info = gr.HTML()
+
+        # ═══════════════════════════════════════════════════════════════════
+        # LANDING PAGE
+        # ═══════════════════════════════════════════════════════════════════
+        landing_view = gr.Group(visible=True)
+        with landing_view:
+            gr.HTML(f'''
+            <div class="rtl-landing">
+              <div class="rtl-landing-header">
+                <span class="rtl-landing-brand">Med<strong>Gemma</strong></span>
+              </div>
+
+              <div class="rtl-landing-content">
+                <!-- LEFT: Architecture Diagram -->
+                <div class="rtl-landing-diagram">
+                  <div class="rtl-model-callout">
+                    <div class="rtl-model-callout-icon">MG</div>
+                    <div class="rtl-model-callout-text">
+                      <strong>MedGemma 4B + RTL LoRA</strong>
+                      Open-weight medical AI with custom fine-tuning
+                    </div>
+                  </div>
+
+                  <div class="rtl-pipeline-label">6-Step Audit Pipeline</div>
+                  <div class="rtl-pipeline-steps">
+                    <div class="rtl-pipeline-step"><span class="rtl-step-num">1</span> Claim Extraction</div>
+                    <div class="rtl-pipeline-connector"></div>
+                    <div class="rtl-pipeline-step"><span class="rtl-step-num">2</span> Image Findings</div>
+                    <div class="rtl-pipeline-connector"></div>
+                    <div class="rtl-pipeline-step"><span class="rtl-step-num">3</span> Alignment</div>
+                    <div class="rtl-pipeline-connector"></div>
+                    <div class="rtl-pipeline-step"><span class="rtl-step-num">4</span> Scoring</div>
+                    <div class="rtl-pipeline-connector"></div>
+                    <div class="rtl-pipeline-step"><span class="rtl-step-num">5</span> Rewrite Suggestions</div>
+                    <div class="rtl-pipeline-connector"></div>
+                    <div class="rtl-pipeline-step"><span class="rtl-step-num">6</span> Clinician Summary</div>
+                  </div>
+                </div>
+
+                <!-- RIGHT: Text content -->
+                <div class="rtl-landing-text">
+                  <h1>Radiology Trust Layer</h1>
+
+                  <p>A MedGemma-powered auditing system that checks whether radiology
+                  reports are faithfully supported by imaging evidence. RTL surfaces
+                  where language is well-supported, uncertain, or potentially misleading
+                  &mdash; without generating diagnoses.</p>
+
+                  <p>Every claim in a radiology report is extracted, checked against
+                  visual findings from the image, and given a trust label. Flagged
+                  claims receive suggested rewrites with calibrated uncertainty language.
+                  Clinicians get an actionable summary; patients get a plain-language
+                  explanation.</p>
+
+                  <div class="rtl-metrics-strip">
+                    <div class="rtl-metric-item">
+                      <div class="rtl-metric-value">96%</div>
+                      <div class="rtl-metric-label">JSON Schema<br>Compliance</div>
+                    </div>
+                    <div class="rtl-metric-item">
+                      <div class="rtl-metric-value">89%</div>
+                      <div class="rtl-metric-label">Label<br>Accuracy</div>
+                    </div>
+                    <div class="rtl-metric-item">
+                      <div class="rtl-metric-value">6</div>
+                      <div class="rtl-metric-label">Pipeline<br>Steps</div>
+                    </div>
+                    <div class="rtl-metric-item">
+                      <div class="rtl-metric-value">4B</div>
+                      <div class="rtl-metric-label">Model<br>Parameters</div>
+                    </div>
+                  </div>
+
+                  <div class="rtl-landing-disclaimer">
+                    <span class="rtl-disclaimer-badge">Disclaimer</span>
+                    This is a research demonstration for the MedGemma Impact Challenge.
+                    It is not intended for clinical use. Do not upload real patient data.
+                    All example cases use public chest X-ray images.
+                  </div>
+                </div>
+              </div>
+            </div>
+            ''')
+            with gr.Row(elem_classes=["rtl-landing-cta-row"]):
+                landing_cta = gr.Button("Try Demo", elem_classes=["rtl-cta-btn"])
+                landing_login = gr.Button("Log In", elem_classes=["rtl-cta-secondary"])
 
         # ═══════════════════════════════════════════════════════════════════
         # LOGIN VIEW
@@ -590,7 +1017,7 @@ def main() -> gr.Blocks:
         # ═══════════════════════════════════════════════════════════════════
         # SINGLE AUDIT VIEW
         # ═══════════════════════════════════════════════════════════════════
-        single_view = gr.Group(visible=True)
+        single_view = gr.Group(visible=False)
         with single_view:
             gr.Markdown("## Single Study Audit")
             gr.Markdown(
@@ -785,7 +1212,7 @@ Always consult qualified radiologists for medical decisions.
         # ALL VIEWS list (must match PAGES order)
         # ═══════════════════════════════════════════════════════════════════
         all_views = [
-            login_view, home_view, single_view, batch_view,
+            landing_view, login_view, home_view, single_view, batch_view,
             detail_view, history_view, evaluation_view, settings_view,
         ]
 
@@ -1014,7 +1441,7 @@ Always consult qualified radiologists for medical decisions.
         # ═══════════════════════════════════════════════════════════════════
 
         # Shared output list: state + nav_group + all page views + home_header + recent_table
-        _shared_nav_outputs = [state, nav_group] + all_views + [home_header, recent_table]
+        _shared_nav_outputs = [state, nav_group, nav_page_info] + all_views + [home_header, recent_table]
 
         # Detail component list
         _detail_comps = [
@@ -1088,27 +1515,33 @@ Always consult qualified radiologists for medical decisions.
         login_btn.click(
             do_login,
             inputs=[login_email, login_pw, state],
-            outputs=[state, login_msg, nav_group] + all_views + [home_header, recent_table],
+            outputs=[state, login_msg, nav_group, nav_page_info] + all_views + [home_header, recent_table],
         )
         create_btn.click(
             do_create,
             inputs=[create_email, create_name_box, create_pw, state],
-            outputs=[state, create_msg, nav_group] + all_views + [home_header, recent_table],
+            outputs=[state, create_msg, nav_group, nav_page_info] + all_views + [home_header, recent_table],
         )
 
         # Open detail from home / history
         home_open_btn.click(
             lambda run_id, st: (st,) + _set_views("detail") + _load_detail(run_id.strip()),
             inputs=[home_run_id_box, state],
-            outputs=[state, nav_group] + all_views + _detail_comps,
+            outputs=[state, nav_group, nav_page_info] + all_views + _detail_comps,
         )
         hist_open_btn.click(
             lambda run_id, st: (st,) + _set_views("detail") + _load_detail(run_id.strip()),
             inputs=[hist_run_id_box, state],
-            outputs=[state, nav_group] + all_views + _detail_comps,
+            outputs=[state, nav_group, nav_page_info] + all_views + _detail_comps,
         )
 
+        # Landing page buttons
+        landing_cta.click(lambda st: go_to("single", st), inputs=[state], outputs=_shared_nav_outputs)
+        landing_login.click(lambda st: go_to("login", st), inputs=[state], outputs=_shared_nav_outputs)
+
         # Navigation — persistent nav bar
+        nav_home_btn.click(lambda st: go_to("landing", st), inputs=[state], outputs=_shared_nav_outputs)
+        nav_demo.click(lambda st: go_to("landing", st), inputs=[state], outputs=_shared_nav_outputs)
         nav_single.click(lambda st: go_to("single", st), inputs=[state], outputs=_shared_nav_outputs)
         nav_batch.click(lambda st: go_to("batch", st), inputs=[state], outputs=_shared_nav_outputs)
         nav_history.click(lambda st: go_to("history", st), inputs=[state], outputs=_shared_nav_outputs)
@@ -1167,9 +1600,9 @@ Always consult qualified radiologists for medical decisions.
 
         # Initial view on load
         demo.load(
-            lambda st: (st,) + _set_views(st.get("page", "single")) + ("", []),
+            lambda st: (st,) + _set_views(st.get("page", "landing")) + ("", []),
             inputs=[state],
-            outputs=[state, nav_group] + all_views + [home_header, recent_table],
+            outputs=[state, nav_group, nav_page_info] + all_views + [home_header, recent_table],
         )
 
     return demo
@@ -1242,6 +1675,7 @@ if __name__ == "__main__":
     light_theme = gr.themes.Base(
         primary_hue=gr.themes.colors.blue,
         neutral_hue=gr.themes.colors.gray,
+        font=["Inter", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
     )
     # Override the dark mode colors to be the same as light
     light_theme.set(

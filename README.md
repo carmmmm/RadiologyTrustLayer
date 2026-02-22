@@ -1,15 +1,3 @@
----
-title: Radiology Trust Layer
-emoji: 🏥
-colorFrom: blue
-colorTo: indigo
-sdk: gradio
-sdk_version: "6.6.0"
-app_file: spaces_app/app.py
-pinned: true
-license: apache-2.0
----
-
 # Radiology Trust Layer (RTL)
 
 A MedGemma-powered multimodal auditing system that checks whether radiology reports are faithfully supported by imaging evidence. RTL extracts claims from free-text reports, analyzes the corresponding medical image, aligns each claim to visual findings, scores report accuracy, and generates actionable feedback for clinicians and patients.
