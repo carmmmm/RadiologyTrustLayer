@@ -1012,23 +1012,26 @@ def _loading_results_html(step: int = 1, total: int = 6) -> str:
     step_items = ""
     for i, s in enumerate(steps):
         if i + 1 < step:
-            icon = '<span style="color:#34a853;">&#10003;</span>'
-            color = "#5f6368"
+            icon = '<span style="color:#137333;font-weight:700;">&#10003;</span>'
+            color = "#3c4043"
+            weight = "400"
         elif i + 1 == step:
-            icon = '<span class="rtl-loading-spinner" style="width:12px;height:12px;border-width:2px;display:inline-block;vertical-align:middle;"></span>'
+            icon = '<span class="rtl-loading-spinner" style="width:14px;height:14px;border-width:2.5px;display:inline-block;vertical-align:middle;"></span>'
             color = "#1a73e8"
+            weight = "600"
         else:
-            icon = '<span style="color:#dadce0;">&#9679;</span>'
-            color = "#9aa0a6"
-        step_items += f'<div style="display:flex;align-items:center;gap:8px;padding:4px 0;font-size:0.78rem;color:{color};">{icon} {s}</div>'
-    return f'''<div style="padding:32px 24px;text-align:center;">
-  <div class="rtl-loading-spinner" style="width:36px;height:36px;border-width:3px;margin:0 auto 16px;"></div>
-  <div style="font-size:1.1rem;font-weight:600;color:#202124;margin-bottom:4px;">Running Audit Pipeline</div>
-  <div style="font-size:0.85rem;color:#5f6368;margin-bottom:16px;">Step {step}/{total}: {current}...</div>
-  <div style="background:#e8eaed;border-radius:4px;height:6px;max-width:320px;margin:0 auto 20px;">
-    <div style="background:#1a73e8;border-radius:4px;height:6px;width:{pct}%;transition:width 0.3s;"></div>
+            icon = '<span style="color:#bdc1c6;">&#9679;</span>'
+            color = "#80868b"
+            weight = "400"
+        step_items += f'<div style="display:flex;align-items:center;gap:10px;padding:5px 0;font-size:0.85rem;color:{color};font-weight:{weight};">{icon} {s}</div>'
+    return f'''<div style="padding:40px 24px;text-align:center;">
+  <div class="rtl-loading-spinner" style="width:40px;height:40px;border-width:3.5px;margin:0 auto 20px;"></div>
+  <div style="font-size:1.2rem;font-weight:700;color:#202124;margin-bottom:6px;">Running Audit Pipeline</div>
+  <div style="font-size:0.9rem;font-weight:500;color:#3c4043;margin-bottom:20px;">Step {step}/{total}: {current}...</div>
+  <div style="background:#dadce0;border-radius:4px;height:8px;max-width:320px;margin:0 auto 24px;">
+    <div style="background:#1a73e8;border-radius:4px;height:8px;width:{pct}%;transition:width 0.3s;"></div>
   </div>
-  <div style="text-align:left;max-width:280px;margin:0 auto;">{step_items}</div>
+  <div style="text-align:left;max-width:300px;margin:0 auto;">{step_items}</div>
 </div>'''
 
 
@@ -1145,21 +1148,9 @@ def main() -> gr.Blocks:
 </div>''')
                 with gr.Column(scale=2):
                     gr.HTML('''<div style="font-size:0.88rem;color:#3c4043;line-height:1.7;padding-top:32px;padding-right:60px;">
-  <p style="margin-top:0;">A MedGemma-powered multimodal auditing system that checks whether
-  radiology reports are faithfully supported by imaging evidence.
-  RTL surfaces where clinical language is well-supported, uncertain,
-  or potentially misleading — without generating diagnoses or replacing
-  radiologist judgment.</p>
-  <p>The system extracts every claim from a free-text radiology report,
-  analyzes the corresponding medical image with MedGemma's vision encoder,
-  and aligns each claim to visual findings. Claims are labeled as
-  <em>supported</em>, <em>uncertain</em>, or <em>needs review</em>.
-  Flagged claims receive suggested rewrites using calibrated uncertainty
-  language — turning overconfident statements into properly hedged ones.
-  Clinicians get a structured summary highlighting key concerns;
-  patients get an accessible plain-language explanation of the findings.</p>
-  <p style="margin-bottom:0;">Built on Google's MedGemma-4B-IT with a custom LoRA adapter
-  fine-tuned for JSON schema compliance and uncertainty calibration.</p>
+  <p style="margin-top:0;">Radiology Trust Layer is designed to audit radiology report language, not to generate diagnoses or replace clinical judgment.</p>
+  <p>The system extracts every claim from a free-text radiology report, analyzes the corresponding medical image with MedGemma's vision encoder, and aligns each claim to visual findings. Claims are labeled as <em>supported</em>, <em>uncertain</em>, or <em>needs review</em>. Flagged claims receive suggested rewrites using calibrated uncertainty language — turning overconfident statements into properly hedged ones. Clinicians get a structured summary highlighting key concerns; patients get an accessible plain-language explanation of the findings.</p>
+  <p style="margin-bottom:0;">Built on Google's MedGemma-4B-IT with a custom LoRA adapter fine-tuned for JSON schema compliance and uncertainty calibration.</p>
 </div>''')
             # Large metrics strip — full width, bigger numbers
             gr.HTML('''<div style="display:flex;gap:0;padding:28px 0 12px 0;border-top:1px solid rgba(0,0,0,0.08);margin-top:12px;">

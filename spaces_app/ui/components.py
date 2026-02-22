@@ -88,12 +88,22 @@ def rewrite_suggestions_html(rewrites: list[dict]) -> str:
 
     parts = []
     for rw in rewrites:
+        suggested = rw.get('suggested', '')
+        is_verify = suggested.startswith("Verify with radiologist")
+        if is_verify:
+            label_text = "Action needed"
+            label_color = "#c5221f"
+            suggestion_style = 'color:#c5221f;font-weight:500;'
+        else:
+            label_text = "Suggested rewrite"
+            label_color = "#137333"
+            suggestion_style = ''
         parts.append(f'''
         <div class="rtl-rewrite-card">
           <div class="rtl-rewrite-label" style="color:#5f6368;">Original</div>
           <div style="color:#202124;margin-bottom:8px;">"{rw.get('original', '')}"</div>
-          <div class="rtl-rewrite-label" style="color:#137333;">Suggested rewrite</div>
-          <div class="rtl-rewrite-suggested">"{rw.get('suggested', '')}"</div>
+          <div class="rtl-rewrite-label" style="color:{label_color};">{label_text}</div>
+          <div class="rtl-rewrite-suggested" style="{suggestion_style}">"{suggested}"</div>
           <div class="rtl-rewrite-reason">Reason: {rw.get('reason', '')}</div>
         </div>''')
 
