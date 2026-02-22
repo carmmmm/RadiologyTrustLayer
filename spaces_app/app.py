@@ -268,7 +268,6 @@ button.secondary {
 }
 .rtl-badge-supported { background: #e6f4ea; color: #137333; }
 .rtl-badge-uncertain { background: #fef7e0; color: #b06000; }
-.rtl-badge-not-assessable { background: #e8f0fe; color: #1967d2; }
 .rtl-badge-needs-review { background: #fce8e6; color: #c5221f; }
 
 /* Rewrite Cards */
@@ -1011,13 +1010,18 @@ def main() -> gr.Blocks:
         # ═══════════════════════════════════════════════════════════════════
         landing_view = gr.Group(visible=True)
         with landing_view:
-            # Top bar: MG callout on left, MedGemma brand on right
-            gr.HTML('''<div style="display:flex;align-items:center;justify-content:space-between;padding:24px 28px 12px 28px;">
-  <div class="rtl-model-callout" style="margin:0;flex-shrink:0;">
-    <div class="rtl-model-callout-icon">MG</div>
-    <div class="rtl-model-callout-text"><strong>MedGemma 4B + RTL LoRA</strong>Open-weight medical AI with custom fine-tuning</div>
+            # Top bar: MG callout left | RTL title + MedGemma brand right (aligned to columns)
+            gr.HTML('''<div style="display:flex;align-items:center;padding:24px 28px 12px 28px;gap:16px;">
+  <div style="flex:1;min-width:280px;">
+    <div class="rtl-model-callout" style="margin:0;">
+      <div class="rtl-model-callout-icon">MG</div>
+      <div class="rtl-model-callout-text"><strong>MedGemma 4B + RTL LoRA</strong>Open-weight medical AI with custom fine-tuning</div>
+    </div>
   </div>
-  <span style="font-size:1.15rem;color:#5f6368;letter-spacing:0.02em;">Med<strong style="color:#202124;font-weight:600;">Gemma</strong></span>
+  <div style="flex:2;display:flex;align-items:center;justify-content:space-between;">
+    <span style="font-size:1.8rem;font-weight:700;color:#202124;letter-spacing:-0.01em;">Radiology Trust Layer</span>
+    <span style="font-size:1.15rem;color:#5f6368;letter-spacing:0.02em;">Med<strong style="color:#202124;font-weight:600;">Gemma</strong></span>
+  </div>
 </div>''')
             # Two-column layout: pipeline left, title + description right
             with gr.Row(equal_height=False):
@@ -1038,7 +1042,6 @@ def main() -> gr.Blocks:
 </div>''')
                 with gr.Column(scale=2):
                     gr.Markdown(
-                        "# Radiology Trust Layer\n\n"
                         "A MedGemma-powered multimodal auditing system that checks whether "
                         "radiology reports are faithfully supported by imaging evidence. "
                         "RTL surfaces where clinical language is well-supported, uncertain, "
@@ -1047,7 +1050,7 @@ def main() -> gr.Blocks:
                         "The system extracts every claim from a free-text radiology report, "
                         "analyzes the corresponding medical image with MedGemma's vision encoder, "
                         "and aligns each claim to visual findings. Claims are labeled as "
-                        "*supported*, *uncertain*, *needs review*, or *not assessable*. "
+                        "*supported*, *uncertain*, or *needs review*. "
                         "Flagged claims receive suggested rewrites using calibrated uncertainty "
                         "language — turning overconfident statements into properly hedged ones. "
                         "Clinicians get a structured summary highlighting key concerns; "

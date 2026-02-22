@@ -34,7 +34,7 @@
   ],
   "overall_score": 80,
   "severity": "low",
-  "flag_counts": {"supported": 4, "uncertain": 1, "not_assessable": 0, "needs_review": 0},
+  "flag_counts": {"supported": 4, "uncertain": 1, "needs_review": 0},
   "rewrites": [
     {
       "claim_id": "c5",

@@ -23,7 +23,7 @@ OVERCONFIDENT_PATTERNS = [
     r"\bdefinitely\b", r"\bclearly\b", r"\bobviously\b", r"\bconfirms\b",
     r"\bno doubt\b", r"\bwithout question\b", r"\bconclusively\b",
 ]
-LABELS = {"supported", "uncertain", "not_assessable", "needs_review"}
+LABELS = {"supported", "uncertain", "needs_review"}
 
 
 def is_json_valid(text: str) -> bool:

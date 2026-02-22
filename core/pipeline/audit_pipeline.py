@@ -156,7 +156,7 @@ def run_audit(
         schema_repairs.append("rewrite")
 
     # ── Step 5b: Clinician summary ────────────────────────────────────────
-    flagged_claims = [a for a in alignments if a.get("label") in ("uncertain", "needs_review", "not_assessable")]
+    flagged_claims = [a for a in alignments if a.get("label") in ("uncertain", "needs_review")]
     prompt = _load_prompt(
         "clinician_summary",
         overall_score=overall_score,

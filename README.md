@@ -35,7 +35,7 @@ RTL runs a **6-step AI pipeline** on every radiology case:
 |------|------|-------|--------|
 | 1 | **Claim Extraction** | Report text | Structured list of clinical claims |
 | 2 | **Image Findings** | Radiology image | Visual findings detected by MedGemma |
-| 3 | **Alignment** | Claims + Findings | Each claim labeled: supported, uncertain, not_assessable, needs_review |
+| 3 | **Alignment** | Claims + Findings | Each claim labeled: supported, uncertain, needs_review |
 | 4 | **Scoring** | Alignments | 0-100 safety score + severity (low/medium/high) |
 | 5 | **Rewrite Suggestions** | Flagged claims + report | Suggested corrections for uncertain/flagged claims |
 | 6 | **Clinician Summary + Patient Explanation** | All above | Actionable summary for clinicians; plain-language version for patients |

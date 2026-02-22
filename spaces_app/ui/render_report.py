@@ -5,14 +5,12 @@ import html
 LABEL_STYLE = {
     "supported": "background:#dcfce7;border-bottom:2px solid #16a34a;",
     "uncertain": "background:#fef9c3;border-bottom:2px solid #ca8a04;",
-    "not_assessable": "background:#dbeafe;border-bottom:2px solid #2563eb;",
     "needs_review": "background:#fee2e2;border-bottom:2px solid #dc2626;",
 }
 
 LABEL_TOOLTIP = {
     "supported": "Supported by imaging evidence",
     "uncertain": "Uncertain — insufficient visual evidence",
-    "not_assessable": "Not assessable from this image",
     "needs_review": "Needs clinical review — possible mismatch",
 }
 
@@ -73,7 +71,6 @@ def _legend_html() -> str:
     items = [
         ("Supported", "rtl-dot-green", LABEL_STYLE["supported"]),
         ("Uncertain", "rtl-dot-amber", LABEL_STYLE["uncertain"]),
-        ("Not Assessable", "rtl-dot-blue", LABEL_STYLE["not_assessable"]),
         ("Needs Review", "rtl-dot-red", LABEL_STYLE["needs_review"]),
     ]
     parts = "".join(

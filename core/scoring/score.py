@@ -1,12 +1,11 @@
 """Compute 0-100 safety score and severity label from alignment results."""
 from typing import Literal
 
-Label = Literal["supported", "uncertain", "not_assessable", "needs_review"]
+Label = Literal["supported", "uncertain", "needs_review"]
 
 PENALTY = {
     "supported": 0,
     "uncertain": 8,
-    "not_assessable": 12,
     "needs_review": 25,
 }
 
@@ -19,7 +18,7 @@ def compute_score(claims: list[dict]) -> tuple[int, str, dict]:
         (overall_score 0-100, severity "low"|"medium"|"high", flag_counts dict)
     """
     if not claims:
-        return 100, "low", {"supported": 0, "uncertain": 0, "not_assessable": 0, "needs_review": 0}
+        return 100, "low", {"supported": 0, "uncertain": 0, "needs_review": 0}
 
     counts: dict[str, int] = {k: 0 for k in PENALTY}
     total_penalty = 0
@@ -55,7 +54,6 @@ def label_badge(label: str) -> str:
     dots = {
         "supported": '<span class="rtl-dot rtl-dot-green"></span>',
         "uncertain": '<span class="rtl-dot rtl-dot-amber"></span>',
-        "not_assessable": '<span class="rtl-dot rtl-dot-blue"></span>',
         "needs_review": '<span class="rtl-dot rtl-dot-red"></span>',
     }
     return dots.get(label, '<span class="rtl-dot" style="background:#9aa0a6;"></span>')

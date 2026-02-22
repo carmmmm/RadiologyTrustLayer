@@ -25,7 +25,6 @@ def flag_counts_html(flag_counts: dict) -> str:
     items = [
         ("supported", "Supported", "#34a853", "rtl-dot-green"),
         ("uncertain", "Uncertain", "#fbbc04", "rtl-dot-amber"),
-        ("not_assessable", "Not Assessable", "#4285f4", "rtl-dot-blue"),
         ("needs_review", "Needs Review", "#ea4335", "rtl-dot-red"),
     ]
     parts = []
@@ -48,7 +47,6 @@ def claim_table_html(alignments: list[dict]) -> str:
     badge_class = {
         "supported": "rtl-badge-supported",
         "uncertain": "rtl-badge-uncertain",
-        "not_assessable": "rtl-badge-not-assessable",
         "needs_review": "rtl-badge-needs-review",
     }
 

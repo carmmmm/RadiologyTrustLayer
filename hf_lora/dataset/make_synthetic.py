@@ -44,7 +44,7 @@ def make_claim(i: int) -> dict:
     return {"claim_id": f"c{i+1}", "text": text, "sentence_span": {"start": i*60, "end": i*60+len(text)}, "claim_type": ctype}
 
 
-LABELS = ["supported", "uncertain", "not_assessable", "needs_review"]
+LABELS = ["supported", "uncertain", "needs_review"]
 
 OVERCONFIDENT_PHRASES = [
     ("There is definitely", "There appears to be"),
