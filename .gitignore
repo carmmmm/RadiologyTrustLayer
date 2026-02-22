@@ -66,13 +66,8 @@ hf_lora/**/checkpoints/
 *.tmp
 
 ############################
-# AI assistant artifacts (Claude / Copilot / Cursor / Anthropic)
+# IDE extensions / tool artifacts
 ############################
-.claude/
-**/.claude/
-claude.*
-*claude*
-anthropic*
 .cursor/
 **/.cursor/
 

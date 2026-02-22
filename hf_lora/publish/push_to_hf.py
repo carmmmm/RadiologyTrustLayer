@@ -91,7 +91,7 @@ model = model.merge_and_unload()
 
 ## Evaluation
 
-See the [RTL GitHub repository](https://github.com) for before/after evaluation metrics.
+See the [RTL GitHub repository](https://github.com/carmmmm/RadiologyTrustLayer) for before/after evaluation metrics.
 
 ## Disclaimer
 
