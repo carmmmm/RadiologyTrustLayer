@@ -494,37 +494,37 @@ button.secondary {
 
 /* Pipeline Architecture Diagram */
 .rtl-model-callout {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 12px;
-    padding: 14px 16px;
+    gap: 8px;
+    padding: 8px 14px;
     background: linear-gradient(135deg, #e8f0fe, #f8f9fa);
     border: 1.5px solid #d2e3fc;
-    border-radius: 20px;
-    margin-bottom: 20px;
+    border-radius: 16px;
+    margin-bottom: 0;
 }
 .rtl-model-callout-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 12px;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
     background: #202124;
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
     font-weight: 700;
-    font-size: 0.75rem;
+    font-size: 0.65rem;
     flex-shrink: 0;
 }
 .rtl-model-callout-text {
-    font-size: 0.8rem;
+    font-size: 0.72rem;
     color: #3c4043;
-    line-height: 1.4;
+    line-height: 1.3;
 }
 .rtl-model-callout-text strong {
     color: #202124;
     display: block;
-    font-size: 0.9rem;
+    font-size: 0.78rem;
 }
 
 .rtl-pipeline-label {
@@ -718,11 +718,14 @@ button.secondary {
     margin: 0;
 }
 
-/* Hide Gradio's built-in progress bars — we use our own spinner */
+/* Hide Gradio's built-in progress bars and error toasts — we use our own UI */
 .gradio-container .progress-bar,
 .gradio-container .progress-text,
 .gradio-container .meta-text,
 .gradio-container .progress-level {
+    display: none !important;
+}
+.toast-wrap, .toast-body, .toast-close {
     display: none !important;
 }
 
@@ -822,6 +825,61 @@ def _load_example_case(index: int):
     report = rpt_path.read_text().strip() if rpt_path.exists() else ""
     label = ex["label"]
     return image, label, report
+
+
+def _load_preloaded_demo(index: int):
+    """Load example case AND pre-computed mock results for instant demo display."""
+    from core.pipeline.medgemma_client import _MOCK_PNEUMONIA, _MOCK_CHF, _MOCK_NORMAL
+    from core.scoring.score import compute_score
+
+    if index >= len(EXAMPLE_CASES):
+        return (None, "", "") + ("",) * 8
+
+    ex = EXAMPLE_CASES[index]
+    img_path = _ROOT / ex["image_path"]
+    rpt_path = _ROOT / ex["report_path"]
+    image = Image.open(img_path) if img_path.exists() else None
+    report = rpt_path.read_text().strip() if rpt_path.exists() else ""
+    label = ex["label"]
+
+    # Pick the right mock data based on case index
+    mock_sets = [_MOCK_PNEUMONIA, _MOCK_CHF, _MOCK_NORMAL]
+    mock = mock_sets[index] if index < len(mock_sets) else _MOCK_PNEUMONIA
+
+    claims = mock["claim_extraction"]["claims"]
+    alignments = mock["alignment"]["alignments"]
+    # Merge claim text into alignments
+    claim_map = {c["claim_id"]: c for c in claims}
+    for a in alignments:
+        a["claim_text"] = claim_map.get(a.get("claim_id", ""), {}).get("text", "")
+
+    overall_score, severity, flag_counts = compute_score(alignments)
+
+    score_html = score_gauge_html(overall_score, severity)
+    flag_html = flag_counts_html(flag_counts)
+    report_html = render_highlighted_report(report, alignments, claims)
+    claims_html = claim_table_html(alignments)
+    rewrites_html = rewrite_suggestions_html(mock["rewrite"].get("rewrites", []))
+
+    cs = mock.get("clinician_summary", {})
+    clinician_md = (
+        f"**Summary:** {cs.get('summary', '')}\n\n"
+        f"**Recommendation:** {cs.get('recommendation', '').replace('_', ' ').title()}\n\n"
+        + ("**Key Concerns:**\n" + "\n".join(f"- {c}" for c in cs.get("key_concerns", [])) if cs.get("key_concerns") else "")
+        + f"\n\n*{cs.get('confidence_note', '')}*"
+    )
+
+    pe = mock.get("patient_explain", {})
+    patient_md = (
+        f"**Summary:**\n\n{pe.get('plain_language_summary', '')}\n\n"
+        f"**What was found:** {pe.get('what_was_found', '')}\n\n"
+        f"**What it means:** {pe.get('what_it_means', '')}\n\n"
+        f"**Next steps:** {pe.get('next_steps', '')}"
+    )
+
+    return (image, label, report,
+            score_html, flag_html, report_html, claims_html,
+            rewrites_html, clinician_md, patient_md)
 
 
 # ─────────────────────────── State helpers ────────────────────────────────
@@ -1041,23 +1099,23 @@ def main() -> gr.Blocks:
   <div class="rtl-pipeline-step"><span class="rtl-step-num">6</span> Clinician Summary</div>
 </div>''')
                 with gr.Column(scale=2):
-                    gr.Markdown(
-                        "A MedGemma-powered multimodal auditing system that checks whether "
-                        "radiology reports are faithfully supported by imaging evidence. "
-                        "RTL surfaces where clinical language is well-supported, uncertain, "
-                        "or potentially misleading — without generating diagnoses or replacing "
-                        "radiologist judgment.\n\n"
-                        "The system extracts every claim from a free-text radiology report, "
-                        "analyzes the corresponding medical image with MedGemma's vision encoder, "
-                        "and aligns each claim to visual findings. Claims are labeled as "
-                        "*supported*, *uncertain*, or *needs review*. "
-                        "Flagged claims receive suggested rewrites using calibrated uncertainty "
-                        "language — turning overconfident statements into properly hedged ones. "
-                        "Clinicians get a structured summary highlighting key concerns; "
-                        "patients get an accessible plain-language explanation of the findings.\n\n"
-                        "Built on Google's MedGemma-4B-IT with a custom LoRA adapter "
-                        "fine-tuned for JSON schema compliance and uncertainty calibration."
-                    )
+                    gr.HTML('''<div style="font-size:0.92rem;color:#3c4043;line-height:1.7;padding-top:0;">
+  <p style="margin-top:0;">A MedGemma-powered multimodal auditing system that checks whether
+  radiology reports are faithfully supported by imaging evidence.
+  RTL surfaces where clinical language is well-supported, uncertain,
+  or potentially misleading — without generating diagnoses or replacing
+  radiologist judgment.</p>
+  <p>The system extracts every claim from a free-text radiology report,
+  analyzes the corresponding medical image with MedGemma's vision encoder,
+  and aligns each claim to visual findings. Claims are labeled as
+  <em>supported</em>, <em>uncertain</em>, or <em>needs review</em>.
+  Flagged claims receive suggested rewrites using calibrated uncertainty
+  language — turning overconfident statements into properly hedged ones.
+  Clinicians get a structured summary highlighting key concerns;
+  patients get an accessible plain-language explanation of the findings.</p>
+  <p style="margin-bottom:0;">Built on Google's MedGemma-4B-IT with a custom LoRA adapter
+  fine-tuned for JSON schema compliance and uncertainty calibration.</p>
+</div>''')
             # Large metrics strip — full width, bigger numbers
             gr.HTML('''<div style="display:flex;gap:0;padding:28px 0 12px 0;border-top:1px solid rgba(0,0,0,0.08);margin-top:12px;">
   <div style="flex:1;text-align:center;border-right:1px solid rgba(0,0,0,0.06);"><span style="font-size:2.4rem;font-weight:700;color:#202124;">96%</span><div style="font-size:0.78rem;color:#5f6368;margin-top:4px;">Schema Compliance</div></div>
@@ -1074,7 +1132,7 @@ def main() -> gr.Blocks:
         demo_view = gr.Group(visible=False)
         with demo_view:
             gr.Markdown("## Demo")
-            gr.Markdown("Select a pre-loaded chest X-ray case to see RTL in action.")
+            gr.Markdown("Select a pre-loaded chest X-ray case. Results are pre-computed with MedGemma for instant display.")
             with gr.Row():
                 demo_btn_1 = gr.Button(
                     "CXR 01 — Right Lower Lobe Pneumonia\nExpected severity: Low",
@@ -1088,16 +1146,14 @@ def main() -> gr.Blocks:
                     "CXR 03 — Normal Study\nExpected severity: Low",
                     elem_classes=["rtl-demo-card-btn"],
                 )
+            gr.HTML('<div style="font-size:0.75rem;color:#5f6368;text-align:center;padding:4px 0 8px 0;">Results previously generated by MedGemma — select a case to view</div>')
             with gr.Row():
                 with gr.Column(scale=1):
                     demo_image = gr.Image(label="Radiology Image", type="pil", height=300, interactive=False)
                     demo_case_label = gr.Textbox(label="Case", interactive=False)
                     demo_report = gr.Textbox(label="Report", lines=6, interactive=False)
-                    demo_lora = gr.Checkbox(label="Use RTL LoRA adapter", value=False)
-                    demo_run_btn = gr.Button("Run Audit", variant="primary", size="lg")
-                    demo_status = gr.HTML()
                 with gr.Column(scale=1):
-                    demo_score_html = gr.HTML('<p style="color:#5f6368;">Select a case above, then click Run Audit.</p>')
+                    demo_score_html = gr.HTML('<p style="color:#5f6368;">Select a case above to view pre-computed results.</p>')
                     demo_flag_html = gr.HTML()
                     with gr.Tabs():
                         with gr.Tab("Report Highlights"):
@@ -1688,7 +1744,7 @@ Always consult qualified radiologists for medical decisions.
 
         # Single audit — show loading spinner, then run
         single_run_btn.click(
-            lambda: _loading_html("Running audit pipeline — this may take a minute with real MedGemma..."),
+            lambda: _loading_html("Running audit pipeline — this may take a minute..."),
             outputs=[single_status],
         ).then(
             run_single_audit,
@@ -1701,27 +1757,15 @@ Always consult qualified radiologists for medical decisions.
         )
         single_accept_all.click(accept_all_rewrites, inputs=[state], outputs=[single_edited_report])
 
-        # Demo — card clicks load example, run button audits
-        demo_btn_1.click(lambda: _load_example_case(0), outputs=[demo_image, demo_case_label, demo_report])
-        demo_btn_2.click(lambda: _load_example_case(1), outputs=[demo_image, demo_case_label, demo_report])
-        demo_btn_3.click(lambda: _load_example_case(2), outputs=[demo_image, demo_case_label, demo_report])
-
-        def run_demo_audit(image, case_label, report, use_lora, st):
-            result = run_single_audit(image, case_label, report, use_lora, st, progress)
-            return result[:-1]
-
-        demo_run_btn.click(
-            lambda: _loading_html("Running audit pipeline — this may take a minute with real MedGemma..."),
-            outputs=[demo_status],
-        ).then(
-            run_demo_audit,
-            inputs=[demo_image, demo_case_label, demo_report, demo_lora, state],
-            outputs=[
-                state, demo_status, demo_score_html, demo_flag_html,
-                demo_report_html, demo_claims_html, demo_rewrites_html,
-                demo_clinician_md, demo_patient_md,
-            ],
-        )
+        # Demo — card clicks instantly load example + precomputed results
+        _demo_outputs = [
+            demo_image, demo_case_label, demo_report,
+            demo_score_html, demo_flag_html, demo_report_html, demo_claims_html,
+            demo_rewrites_html, demo_clinician_md, demo_patient_md,
+        ]
+        demo_btn_1.click(lambda: _load_preloaded_demo(0), outputs=_demo_outputs)
+        demo_btn_2.click(lambda: _load_preloaded_demo(1), outputs=_demo_outputs)
+        demo_btn_3.click(lambda: _load_preloaded_demo(2), outputs=_demo_outputs)
 
         # Batch audit — show loading spinner, then run
         batch_run_btn.click(
