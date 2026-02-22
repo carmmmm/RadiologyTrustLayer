@@ -724,22 +724,27 @@ button.secondary {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+@keyframes rtl-pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+}
 .rtl-loading {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 12px;
-    padding: 16px 20px;
+    gap: 10px;
+    padding: 10px 18px;
     background: #e8f0fe;
-    border-radius: 8px;
+    border-radius: 20px;
     color: #1967d2;
-    font-size: 0.875rem;
+    font-size: 0.82rem;
     font-weight: 500;
+    animation: rtl-pulse 2s ease-in-out infinite;
 }
 .rtl-loading-spinner {
-    width: 20px;
-    height: 20px;
-    border: 3px solid #d2e3fc;
-    border-top: 3px solid #1a73e8;
+    width: 16px;
+    height: 16px;
+    border: 2.5px solid #d2e3fc;
+    border-top: 2.5px solid #1a73e8;
     border-radius: 50%;
     animation: rtl-spin 0.8s linear infinite;
     flex-shrink: 0;
@@ -998,14 +1003,18 @@ def main() -> gr.Blocks:
         # ═══════════════════════════════════════════════════════════════════
         landing_view = gr.Group(visible=True)
         with landing_view:
-            # Branding top-right
-            gr.HTML('<div style="text-align:right;padding:24px 28px 0 0;"><span style="font-size:1.15rem;color:#5f6368;letter-spacing:0.02em;">Med<strong style="color:#202124;font-weight:600;">Gemma</strong></span></div>')
-            # Two-column layout: diagram left, text right
+            # Header row: MG callout | Title | MedGemma brand — all on one line
+            gr.HTML('''<div style="display:flex;align-items:center;gap:24px;padding:28px 28px 0 28px;">
+  <div class="rtl-model-callout" style="margin:0;flex-shrink:0;">
+    <div class="rtl-model-callout-icon">MG</div>
+    <div class="rtl-model-callout-text"><strong>MedGemma 4B + RTL LoRA</strong>Open-weight medical AI</div>
+  </div>
+  <h1 style="font-size:2.2rem;font-weight:400;color:#202124;margin:0;letter-spacing:-0.02em;flex:1;">Radiology Trust Layer</h1>
+  <span style="font-size:1.15rem;color:#5f6368;letter-spacing:0.02em;flex-shrink:0;">Med<strong style="color:#202124;font-weight:600;">Gemma</strong></span>
+</div>''')
+            # Two-column layout: pipeline left, description right
             with gr.Row(equal_height=False):
                 with gr.Column(scale=1, min_width=280):
-                    # Model callout
-                    gr.HTML('''<div class="rtl-model-callout"><div class="rtl-model-callout-icon">MG</div><div class="rtl-model-callout-text"><strong>MedGemma 4B + RTL LoRA</strong>Open-weight medical AI with custom fine-tuning</div></div>''')
-                    # Pipeline steps — static sticker pills
                     gr.HTML('''<div class="rtl-pipeline-label">6-Step Audit Pipeline</div>
 <div class="rtl-pipeline-steps">
   <div class="rtl-pipeline-step"><span class="rtl-step-num">1</span> Claim Extraction</div>
@@ -1020,10 +1029,8 @@ def main() -> gr.Blocks:
   <div class="rtl-pipeline-connector"></div>
   <div class="rtl-pipeline-step"><span class="rtl-step-num">6</span> Clinician Summary</div>
 </div>''')
-
                 with gr.Column(scale=2):
                     gr.Markdown(
-                        "# Radiology Trust Layer\n\n"
                         "A MedGemma-powered auditing system that checks whether radiology "
                         "reports are faithfully supported by imaging evidence. RTL surfaces "
                         "where language is well-supported, uncertain, or potentially misleading "
@@ -1033,15 +1040,15 @@ def main() -> gr.Blocks:
                         "claims receive suggested rewrites with calibrated uncertainty language. "
                         "Clinicians get an actionable summary; patients get a plain-language explanation."
                     )
-                    # Inline metrics — subtle corporate style
-                    gr.HTML('''<div style="display:flex;gap:28px;padding:20px 0 8px 0;border-top:1px solid rgba(0,0,0,0.06);margin-top:20px;">
-<div style="text-align:center;"><span style="font-size:1.3rem;font-weight:700;color:#202124;">96%</span><div style="font-size:0.68rem;color:#80868b;margin-top:2px;">Schema Compliance</div></div>
-<div style="text-align:center;"><span style="font-size:1.3rem;font-weight:700;color:#202124;">89%</span><div style="font-size:0.68rem;color:#80868b;margin-top:2px;">Label Accuracy</div></div>
-<div style="text-align:center;"><span style="font-size:1.3rem;font-weight:700;color:#202124;">6</span><div style="font-size:0.68rem;color:#80868b;margin-top:2px;">Pipeline Steps</div></div>
-<div style="text-align:center;"><span style="font-size:1.3rem;font-weight:700;color:#202124;">4B</span><div style="font-size:0.68rem;color:#80868b;margin-top:2px;">Parameters</div></div>
-</div><div style="font-size:0.7rem;color:#9aa0a6;padding:4px 0 0 0;">50 synthetic cases · See Evaluation tab for full breakdown</div>''')
-                    # Disclaimer
-                    gr.HTML('''<div class="rtl-landing-disclaimer"><span class="rtl-disclaimer-badge">Disclaimer</span> Research demonstration for the MedGemma Impact Challenge. Not for clinical use. Do not upload real patient data.</div>''')
+            # Large metrics strip — full width, bigger numbers
+            gr.HTML('''<div style="display:flex;gap:0;padding:28px 0 12px 0;border-top:1px solid rgba(0,0,0,0.08);margin-top:12px;">
+  <div style="flex:1;text-align:center;border-right:1px solid rgba(0,0,0,0.06);"><span style="font-size:2.4rem;font-weight:700;color:#202124;">96%</span><div style="font-size:0.78rem;color:#5f6368;margin-top:4px;">Schema Compliance</div></div>
+  <div style="flex:1;text-align:center;border-right:1px solid rgba(0,0,0,0.06);"><span style="font-size:2.4rem;font-weight:700;color:#202124;">89%</span><div style="font-size:0.78rem;color:#5f6368;margin-top:4px;">Label Accuracy</div></div>
+  <div style="flex:1;text-align:center;border-right:1px solid rgba(0,0,0,0.06);"><span style="font-size:2.4rem;font-weight:700;color:#202124;">6</span><div style="font-size:0.78rem;color:#5f6368;margin-top:4px;">Pipeline Steps</div></div>
+  <div style="flex:1;text-align:center;"><span style="font-size:2.4rem;font-weight:700;color:#202124;">4B</span><div style="font-size:0.78rem;color:#5f6368;margin-top:4px;">Model Parameters</div></div>
+</div><div style="font-size:0.72rem;color:#9aa0a6;padding:0 0 4px 0;text-align:center;">Evaluated on 50 synthetic radiology cases · See Evaluation tab for full before/after breakdown</div>''')
+            # Disclaimer
+            gr.HTML('''<div class="rtl-landing-disclaimer"><span class="rtl-disclaimer-badge">Disclaimer</span> Research demonstration for the MedGemma Impact Challenge. Not for clinical use. Do not upload real patient data.</div>''')
 
         # ═══════════════════════════════════════════════════════════════════
         # DEMO VIEW — standalone page with 3 example cases

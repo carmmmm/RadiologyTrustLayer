@@ -4,8 +4,8 @@ For each claim, assign one of these labels:
 
 - **supported**: The image clearly shows evidence that supports this claim
 - **uncertain**: The image shows some evidence, but it is not definitive
-- **not_assessable**: This claim cannot be evaluated from this image (e.g., the relevant region is not visible, the finding requires correlation with prior studies, or the claim is clinical context)
-- **needs_review**: The claim appears to contradict or overstate what is visible; a radiologist should review
+- **not_assessable**: This claim cannot be evaluated from this image (e.g., the relevant anatomy is not visible or off-screen, or the claim is purely clinical context unrelated to imaging)
+- **needs_review**: The claim appears to contradict, overstate, or is unsupported by what is visible in the image; a radiologist should review. IMPORTANT: If the image shows normal findings in the area the claim describes (e.g., claim says fractures but bones appear intact), this is needs_review, NOT not_assessable.
 
 For each alignment:
 - Reference the specific visual findings that support or contradict the claim
