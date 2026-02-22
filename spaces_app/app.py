@@ -43,7 +43,7 @@ STORAGE_DIR = config.STORAGE_DIR
 DB_PATH = config.DB_PATH
 SCHEMA_PATH = _ROOT / "core" / "db" / "schema.sql"
 
-PAGES = ["landing", "login", "home", "single", "batch", "detail", "history", "evaluation", "settings"]
+PAGES = ["landing", "demo", "login", "home", "single", "batch", "detail", "history", "evaluation", "settings"]
 
 
 # ─────────────────────────── CSS Design System ───────────────────────────────
@@ -581,27 +581,7 @@ button.secondary {
     margin-left: 25px;
 }
 
-/* Metrics Strip */
-.rtl-metrics-strip {
-    display: flex;
-    gap: 32px;
-    margin: 16px 0 0 0;
-    padding: 24px 40px;
-    border-top: 1px solid rgba(0,0,0,0.06);
-}
-.rtl-metric-item { text-align: center; flex: 1; }
-.rtl-metric-value {
-    font-size: 1.6rem;
-    font-weight: 600;
-    color: #202124;
-    line-height: 1;
-}
-.rtl-metric-label {
-    font-size: 0.72rem;
-    color: #5f6368;
-    margin-top: 6px;
-    line-height: 1.3;
-}
+/* Metrics Strip — removed, now inline */
 
 /* Disclaimer Badge */
 .rtl-landing-disclaimer {
@@ -819,7 +799,8 @@ def _default_state() -> dict:
 
 
 PAGE_DESCRIPTIONS = {
-    "landing": ("Demo", "Overview of the Radiology Trust Layer and its 6-step audit pipeline"),
+    "landing": ("RTL", "Overview of the Radiology Trust Layer and its 6-step audit pipeline"),
+    "demo": ("Demo", "Try pre-loaded chest X-ray cases to see RTL in action"),
     "single": ("Single Audit", "Upload a radiology image and report to run the full audit pipeline"),
     "batch": ("Batch", "Upload a ZIP archive of cases for bulk processing"),
     "history": ("History", "Browse and filter past audits (requires login)"),
@@ -841,7 +822,8 @@ def _page_info_html(page: str) -> str:
 # Map page names to which nav button index (0-based) should be highlighted
 # Order: RTL, Demo, Single, Batch, History, Evaluation, Settings
 _NAV_ACTIVE = {
-    "landing": 1,
+    "landing": 0,
+    "demo": 1,
     "single": 2,
     "batch": 3,
     "history": 4,
@@ -1022,12 +1004,58 @@ def main() -> gr.Blocks:
                         "claims receive suggested rewrites with calibrated uncertainty language. "
                         "Clinicians get an actionable summary; patients get a plain-language explanation."
                     )
+                    # Inline metrics — subtle corporate style
+                    gr.HTML('''<div style="display:flex;gap:28px;padding:20px 0 8px 0;border-top:1px solid rgba(0,0,0,0.06);margin-top:20px;">
+<div style="text-align:center;"><span style="font-size:1.3rem;font-weight:700;color:#202124;">96%</span><div style="font-size:0.68rem;color:#80868b;margin-top:2px;">Schema Compliance</div></div>
+<div style="text-align:center;"><span style="font-size:1.3rem;font-weight:700;color:#202124;">89%</span><div style="font-size:0.68rem;color:#80868b;margin-top:2px;">Label Accuracy</div></div>
+<div style="text-align:center;"><span style="font-size:1.3rem;font-weight:700;color:#202124;">6</span><div style="font-size:0.68rem;color:#80868b;margin-top:2px;">Pipeline Steps</div></div>
+<div style="text-align:center;"><span style="font-size:1.3rem;font-weight:700;color:#202124;">4B</span><div style="font-size:0.68rem;color:#80868b;margin-top:2px;">Parameters</div></div>
+</div><div style="font-size:0.7rem;color:#9aa0a6;padding:4px 0 0 0;">50 synthetic cases · See Evaluation tab for full breakdown</div>''')
                     # Disclaimer
-                    gr.HTML('''<div class="rtl-landing-disclaimer"><span class="rtl-disclaimer-badge">Disclaimer</span> This is a research demonstration for the MedGemma Impact Challenge. Not intended for clinical use. Do not upload real patient data. Example cases use public chest X-ray images from the <a href="https://huggingface.co/datasets/hf-vision/chest-xray-pneumonia" target="_blank" style="color:#1a73e8;">chest-xray-pneumonia</a> dataset.</div>''')
-                    # CTA removed — Demo tab in nav handles navigation
-            # Metrics strip — full width below
-            gr.HTML('''<div class="rtl-metrics-strip"><div class="rtl-metric-item"><div class="rtl-metric-value">96%</div><div class="rtl-metric-label">JSON Schema<br>Compliance</div></div><div class="rtl-metric-item"><div class="rtl-metric-value">89%</div><div class="rtl-metric-label">Label<br>Accuracy</div></div><div class="rtl-metric-item"><div class="rtl-metric-value">6</div><div class="rtl-metric-label">Pipeline<br>Steps</div></div><div class="rtl-metric-item"><div class="rtl-metric-value">4B</div><div class="rtl-metric-label">Model<br>Parameters</div></div></div>''')
-            gr.HTML('<div style="text-align:center;font-size:0.75rem;color:#9aa0a6;padding:8px 0 24px 0;">Metrics from 50 synthetic radiology cases. See <strong>Evaluation</strong> tab for full before/after breakdown.</div>')
+                    gr.HTML('''<div class="rtl-landing-disclaimer"><span class="rtl-disclaimer-badge">Disclaimer</span> Research demonstration for the MedGemma Impact Challenge. Not for clinical use. Do not upload real patient data.</div>''')
+
+        # ═══════════════════════════════════════════════════════════════════
+        # DEMO VIEW — standalone page with 3 example cases
+        # ═══════════════════════════════════════════════════════════════════
+        demo_view = gr.Group(visible=False)
+        with demo_view:
+            gr.Markdown("## Demo")
+            gr.Markdown("Select a pre-loaded chest X-ray case to see RTL in action.")
+            with gr.Row():
+                demo_btn_1 = gr.Button(
+                    "CXR 01 — Right Lower Lobe Pneumonia\nExpected severity: Low",
+                    elem_classes=["rtl-demo-card-btn"],
+                )
+                demo_btn_2 = gr.Button(
+                    "CXR 02 — Congestive Heart Failure\nExpected severity: Medium",
+                    elem_classes=["rtl-demo-card-btn"],
+                )
+                demo_btn_3 = gr.Button(
+                    "CXR 03 — Normal Study\nExpected severity: Low",
+                    elem_classes=["rtl-demo-card-btn"],
+                )
+            with gr.Row():
+                with gr.Column(scale=1):
+                    demo_image = gr.Image(label="Radiology Image", type="pil", height=300, interactive=False)
+                    demo_case_label = gr.Textbox(label="Case", interactive=False)
+                    demo_report = gr.Textbox(label="Report", lines=6, interactive=False)
+                    demo_lora = gr.Checkbox(label="Use RTL LoRA adapter", value=False)
+                    demo_run_btn = gr.Button("Run Audit", variant="primary", size="lg")
+                    demo_status = gr.HTML()
+                with gr.Column(scale=1):
+                    demo_score_html = gr.HTML('<p style="color:#5f6368;">Select a case above, then click Run Audit.</p>')
+                    demo_flag_html = gr.HTML()
+                    with gr.Tabs():
+                        with gr.Tab("Report Highlights"):
+                            demo_report_html = gr.HTML()
+                        with gr.Tab("Claim Analysis"):
+                            demo_claims_html = gr.HTML()
+                        with gr.Tab("Suggested Rewrites"):
+                            demo_rewrites_html = gr.HTML()
+                        with gr.Tab("Clinician Summary"):
+                            demo_clinician_md = gr.Markdown()
+                        with gr.Tab("Patient Explanation"):
+                            demo_patient_md = gr.Markdown()
 
         # ═══════════════════════════════════════════════════════════════════
         # LOGIN VIEW
@@ -1280,7 +1308,7 @@ Always consult qualified radiologists for medical decisions.
         # ALL VIEWS list (must match PAGES order)
         # ═══════════════════════════════════════════════════════════════════
         all_views = [
-            landing_view, login_view, home_view, single_view, batch_view,
+            landing_view, demo_view, login_view, home_view, single_view, batch_view,
             detail_view, history_view, evaluation_view, settings_view,
         ]
 
@@ -1606,14 +1634,7 @@ Always consult qualified radiologists for medical decisions.
 
         # Navigation — persistent nav bar
         nav_home_btn.click(lambda st: go_to("landing", st), inputs=[state], outputs=_shared_nav_outputs)
-
-        # Demo button loads example case into single audit
-        def _demo_click(st):
-            nav_out = go_to("single", st)
-            img, label, report = _load_example_case(0)
-            return nav_out + (img, label, report)
-        nav_demo.click(_demo_click, inputs=[state],
-                       outputs=_shared_nav_outputs + [single_image, single_case_label, single_report])
+        nav_demo.click(lambda st: go_to("demo", st), inputs=[state], outputs=_shared_nav_outputs)
         nav_single.click(lambda st: go_to("single", st), inputs=[state], outputs=_shared_nav_outputs)
         nav_batch.click(lambda st: go_to("batch", st), inputs=[state], outputs=_shared_nav_outputs)
         nav_history.click(lambda st: go_to("history", st), inputs=[state], outputs=_shared_nav_outputs)
@@ -1632,6 +1653,26 @@ Always consult qualified radiologists for medical decisions.
             ],
         )
         single_accept_all.click(accept_all_rewrites, inputs=[state], outputs=[single_edited_report])
+
+        # Demo — card clicks load example, run button audits
+        demo_btn_1.click(lambda: _load_example_case(0), outputs=[demo_image, demo_case_label, demo_report])
+        demo_btn_2.click(lambda: _load_example_case(1), outputs=[demo_image, demo_case_label, demo_report])
+        demo_btn_3.click(lambda: _load_example_case(2), outputs=[demo_image, demo_case_label, demo_report])
+
+        def run_demo_audit(image, case_label, report, use_lora, st, progress=gr.Progress()):
+            result = run_single_audit(image, case_label, report, use_lora, st, progress)
+            # Drop the last element (edited report) — demo doesn't need it
+            return result[:-1]
+
+        demo_run_btn.click(
+            run_demo_audit,
+            inputs=[demo_image, demo_case_label, demo_report, demo_lora, state],
+            outputs=[
+                state, demo_status, demo_score_html, demo_flag_html,
+                demo_report_html, demo_claims_html, demo_rewrites_html,
+                demo_clinician_md, demo_patient_md,
+            ],
+        )
 
         # Batch audit
         batch_run_btn.click(
