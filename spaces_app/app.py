@@ -53,11 +53,14 @@ RTL_CSS = """
 
 /* Google-style design system for RTL */
 
+/* Full-bleed — no white edges */
 .gradio-container {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-    max-width: 1400px !important;
-    margin: 0 auto !important;
-    padding: 0 !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 24px !important;
+    background: linear-gradient(180deg, #f0f2f5 0%, #e8eaed 50%, #f0f2f5 100%) !important;
+    min-height: 100vh;
 }
 
 /* Tab styling */
@@ -400,14 +403,6 @@ button.secondary {
     box-shadow: none !important;
 }
 
-/* Seamless full-width background */
-.gradio-container {
-    background: linear-gradient(180deg, #f0f2f5 0%, #e8eaed 40%, #f8f9fa 100%) !important;
-}
-.main, .wrap, .contain {
-    background: transparent !important;
-}
-
 /* Demo card buttons — styled as clickable cards */
 .rtl-demo-card-btn {
     flex: 1 !important;
@@ -717,6 +712,36 @@ button.secondary {
     white-space: nowrap;
 }
 
+/* Pipeline accordions — sleek style */
+.gradio-container .accordion {
+    border: 1.5px solid #dadce0 !important;
+    border-radius: 14px !important;
+    margin-bottom: 4px !important;
+    background: rgba(255,255,255,0.7) !important;
+    overflow: hidden !important;
+}
+.gradio-container .accordion .label-wrap {
+    padding: 10px 14px !important;
+    font-size: 0.82rem !important;
+    font-weight: 500 !important;
+    color: #202124 !important;
+    background: transparent !important;
+}
+.gradio-container .accordion .label-wrap:hover {
+    background: rgba(26,115,232,0.04) !important;
+}
+.gradio-container .accordion .content {
+    padding: 0 14px 12px 14px !important;
+    font-size: 0.8rem !important;
+    color: #5f6368 !important;
+    line-height: 1.6 !important;
+}
+
+/* Consistent page height — prevents layout shifts */
+.gradio-container .group {
+    min-height: 0 !important;
+}
+
 /* Dummy history overlay */
 .rtl-history-placeholder {
     position: relative;
@@ -849,18 +874,18 @@ def _page_info_html(page: str) -> str:
 
 
 # Map page names to which nav button index (0-based) should be highlighted
-# Order: RTL(landing), Single, Batch, History, Evaluation, Settings
+# Order: RTL, Demo, Single, Batch, History, Evaluation, Settings
 _NAV_ACTIVE = {
-    "landing": 0,
-    "single": 1,
-    "batch": 2,
-    "history": 3,
-    "evaluation": 4,
-    "settings": 5,
+    "landing": 1,
+    "single": 2,
+    "batch": 3,
+    "history": 4,
+    "evaluation": 5,
+    "settings": 6,
     "home": 0,
-    "detail": 1,
+    "detail": 2,
 }
-_NAV_COUNT = 6  # RTL, Single Audit, Batch, History, Evaluation, Settings
+_NAV_COUNT = 7  # RTL, Demo, Single Audit, Batch, History, Evaluation, Settings
 
 
 def _nav_btn_updates(page: str) -> tuple:
@@ -982,6 +1007,7 @@ def main() -> gr.Blocks:
         with nav_group:
             with gr.Row(elem_classes=["rtl-nav-bar-v2"]):
                 nav_home_btn = gr.Button("RTL", size="sm", elem_classes=["rtl-nav-logo"])
+                nav_demo = gr.Button("Demo", size="sm")
                 nav_single = gr.Button("Single Audit", size="sm")
                 nav_batch = gr.Button("Batch", size="sm")
                 nav_history = gr.Button("History", size="sm")
@@ -1003,8 +1029,20 @@ def main() -> gr.Blocks:
                 with gr.Column(scale=1, min_width=280):
                     # Model callout
                     gr.HTML('''<div class="rtl-model-callout"><div class="rtl-model-callout-icon">MG</div><div class="rtl-model-callout-text"><strong>MedGemma 4B + RTL LoRA</strong>Open-weight medical AI with custom fine-tuning</div></div>''')
-                    # Pipeline diagram
-                    gr.HTML('''<div class="rtl-pipeline-label">6-Step Audit Pipeline</div><div class="rtl-pipeline-steps"><div class="rtl-pipeline-step"><span class="rtl-step-num">1</span> Claim Extraction</div><div class="rtl-pipeline-connector"></div><div class="rtl-pipeline-step"><span class="rtl-step-num">2</span> Image Findings</div><div class="rtl-pipeline-connector"></div><div class="rtl-pipeline-step"><span class="rtl-step-num">3</span> Alignment</div><div class="rtl-pipeline-connector"></div><div class="rtl-pipeline-step"><span class="rtl-step-num">4</span> Scoring</div><div class="rtl-pipeline-connector"></div><div class="rtl-pipeline-step"><span class="rtl-step-num">5</span> Rewrite Suggestions</div><div class="rtl-pipeline-connector"></div><div class="rtl-pipeline-step"><span class="rtl-step-num">6</span> Clinician Summary</div></div>''')
+                    # Pipeline steps — clickable accordions
+                    gr.HTML('<div class="rtl-pipeline-label">6-Step Audit Pipeline</div>')
+                    with gr.Accordion("1 — Claim Extraction", open=False):
+                        gr.Markdown("Parses the radiology report into individual clinical claims (e.g. \"No pleural effusion\"). Each claim becomes a unit that can be independently verified against the image.")
+                    with gr.Accordion("2 — Image Findings", open=False):
+                        gr.Markdown("MedGemma analyzes the radiology image and generates a structured list of visual findings — what is actually visible in the scan, independent of the report.")
+                    with gr.Accordion("3 — Alignment", open=False):
+                        gr.Markdown("Each extracted claim is compared against the image findings and labeled: *supported*, *uncertain*, *not assessable*, or *needs review*.")
+                    with gr.Accordion("4 — Scoring", open=False):
+                        gr.Markdown("Computes a 0–100 safety score based on alignment labels. Supported claims score high; uncertain and flagged claims reduce the score proportionally.")
+                    with gr.Accordion("5 — Rewrite Suggestions", open=False):
+                        gr.Markdown("Generates alternative phrasing for uncertain or flagged claims using calibrated uncertainty language (e.g. \"may represent\" instead of \"consistent with\").")
+                    with gr.Accordion("6 — Clinician Summary", open=False):
+                        gr.Markdown("Produces an actionable summary for radiologists highlighting key concerns, plus a plain-language patient explanation of the findings.")
 
                 with gr.Column(scale=2):
                     gr.Markdown(
@@ -1507,7 +1545,7 @@ Always consult qualified radiologists for medical decisions.
         # ═══════════════════════════════════════════════════════════════════
 
         # Shared output list: state + nav_group + all page views + home_header + recent_table
-        _nav_buttons = [nav_home_btn, nav_single, nav_batch, nav_history, nav_eval, nav_settings]
+        _nav_buttons = [nav_home_btn, nav_demo, nav_single, nav_batch, nav_history, nav_eval, nav_settings]
         _shared_nav_outputs = [state, nav_group, nav_page_info] + _nav_buttons + all_views + [home_header, recent_table]
 
         # Detail component list
@@ -1613,6 +1651,7 @@ Always consult qualified radiologists for medical decisions.
         )
         # Navigation — persistent nav bar
         nav_home_btn.click(lambda st: go_to("landing", st), inputs=[state], outputs=_shared_nav_outputs)
+        nav_demo.click(lambda st: go_to("landing", st), inputs=[state], outputs=_shared_nav_outputs)
         nav_single.click(lambda st: go_to("single", st), inputs=[state], outputs=_shared_nav_outputs)
         nav_batch.click(lambda st: go_to("batch", st), inputs=[state], outputs=_shared_nav_outputs)
         nav_history.click(lambda st: go_to("history", st), inputs=[state], outputs=_shared_nav_outputs)
