@@ -1,0 +1,12 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "PatientExplanation",
+  "type": "object",
+  "required": ["plain_language_summary"],
+  "properties": {
+    "plain_language_summary": { "type": "string" },
+    "what_was_found": { "type": "string" },
+    "what_it_means": { "type": "string" },
+    "next_steps": { "type": "string" }
+  }
+}

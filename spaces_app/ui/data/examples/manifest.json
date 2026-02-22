@@ -1,0 +1,33 @@
+{
+  "version": "1.0",
+  "description": "Example radiology cases for RTL demo (synthetic reports, placeholder images)",
+  "examples": [
+    {
+      "label": "CXR 01 — Right Lower Lobe Pneumonia (mixed support)",
+      "case_id": "case_cxr_01",
+      "image_path": "spaces_app/ui/data/examples/case_cxr_01/image.png",
+      "report_path": "spaces_app/ui/data/examples/case_cxr_01/report.txt",
+      "expected_severity": "low",
+      "expected_score_range": [75, 90],
+      "notes": "4 supported claims, 1 uncertain (COPD suggestion)"
+    },
+    {
+      "label": "CXR 02 — Congestive Heart Failure (needs review)",
+      "case_id": "case_cxr_02",
+      "image_path": "spaces_app/ui/data/examples/case_cxr_02/image.png",
+      "report_path": "spaces_app/ui/data/examples/case_cxr_02/report.txt",
+      "expected_severity": "medium",
+      "expected_score_range": [55, 75],
+      "notes": "Some claims may need review depending on image quality"
+    },
+    {
+      "label": "CXR 03 — Normal Study (high support)",
+      "case_id": "case_cxr_03",
+      "image_path": "spaces_app/ui/data/examples/case_cxr_03/image.png",
+      "report_path": "spaces_app/ui/data/examples/case_cxr_03/report.txt",
+      "expected_severity": "low",
+      "expected_score_range": [88, 100],
+      "notes": "Normal study — all claims expected to be supported"
+    }
+  ]
+}

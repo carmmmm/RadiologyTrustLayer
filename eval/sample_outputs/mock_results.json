@@ -1,0 +1,62 @@
+{
+  "run_id": "run_demo_001",
+  "created_at": "2026-02-01T10:00:00Z",
+  "case_label": "CXR_EXAMPLE_001",
+  "model_name": "medgemma",
+  "model_version": "google/medgemma-4b-it",
+  "lora_id": "",
+  "prompt_version": "v1",
+  "mock_mode": true,
+  "image_hash": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2",
+  "report_hash": "b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3",
+  "original_report": "There is consolidation in the right lower lobe consistent with pneumonia. No pleural effusion is identified. The cardiomediastinal silhouette is within normal limits. No pneumothorax is seen. Mild hyperinflation is noted, possibly consistent with early COPD.",
+  "claims": [
+    {"claim_id": "c1", "text": "There is consolidation in the right lower lobe consistent with pneumonia.", "sentence_span": {"start": 0, "end": 70}, "claim_type": "finding"},
+    {"claim_id": "c2", "text": "No pleural effusion is identified.", "sentence_span": {"start": 71, "end": 105}, "claim_type": "absence"},
+    {"claim_id": "c3", "text": "The cardiomediastinal silhouette is within normal limits.", "sentence_span": {"start": 106, "end": 163}, "claim_type": "finding"},
+    {"claim_id": "c4", "text": "No pneumothorax is seen.", "sentence_span": {"start": 164, "end": 187}, "claim_type": "absence"},
+    {"claim_id": "c5", "text": "Mild hyperinflation is noted, possibly consistent with early COPD.", "sentence_span": {"start": 188, "end": 253}, "claim_type": "impression"}
+  ],
+  "findings": [
+    {"finding_id": "f1", "description": "Increased opacity in the right lower lobe", "location": "right lower lobe", "confidence": 0.82, "visual_cue": "Dense white area replacing normal lung markings"},
+    {"finding_id": "f2", "description": "Clear costophrenic angles bilaterally", "location": "bilateral costophrenic angles", "confidence": 0.91, "visual_cue": "Sharp, well-defined angles without blunting"},
+    {"finding_id": "f3", "description": "Normal cardiac borders and mediastinal width", "location": "mediastinum", "confidence": 0.88, "visual_cue": "Cardiac silhouette within normal proportions"},
+    {"finding_id": "f4", "description": "No visible pneumothorax", "location": "bilateral lung apices", "confidence": 0.85, "visual_cue": "Lung markings visible to periphery bilaterally"},
+    {"finding_id": "f5", "description": "Slightly increased AP diameter and flattened diaphragms", "location": "bilateral diaphragms", "confidence": 0.61, "visual_cue": "Diaphragms appear somewhat flattened"}
+  ],
+  "image_quality": "adequate",
+  "alignments": [
+    {"claim_id": "c1", "label": "supported", "evidence": "Right lower lobe opacity (f1) is clearly visible.", "confidence": 0.82, "related_finding_ids": ["f1"], "claim_text": "There is consolidation in the right lower lobe consistent with pneumonia."},
+    {"claim_id": "c2", "label": "supported", "evidence": "Bilateral costophrenic angles are clear (f2), with no blunting.", "confidence": 0.91, "related_finding_ids": ["f2"], "claim_text": "No pleural effusion is identified."},
+    {"claim_id": "c3", "label": "supported", "evidence": "Cardiac borders and mediastinal contour appear normal (f3).", "confidence": 0.88, "related_finding_ids": ["f3"], "claim_text": "The cardiomediastinal silhouette is within normal limits."},
+    {"claim_id": "c4", "label": "supported", "evidence": "Lung markings extend to the periphery (f4), with no visible pleural line.", "confidence": 0.85, "related_finding_ids": ["f4"], "claim_text": "No pneumothorax is seen."},
+    {"claim_id": "c5", "label": "uncertain", "evidence": "Diaphragms appear slightly flattened (f5), but COPD diagnosis requires clinical correlation.", "confidence": 0.61, "related_finding_ids": ["f5"], "claim_text": "Mild hyperinflation is noted, possibly consistent with early COPD."}
+  ],
+  "overall_score": 80,
+  "severity": "low",
+  "flag_counts": {"supported": 4, "uncertain": 1, "not_assessable": 0, "needs_review": 0},
+  "rewrites": [
+    {
+      "claim_id": "c5",
+      "original": "Mild hyperinflation is noted, possibly consistent with early COPD.",
+      "suggested": "There may be mild hyperinflation; clinical correlation is recommended to evaluate for COPD.",
+      "reason": "COPD is a clinical diagnosis; radiographic suggestion should be appropriately hedged."
+    }
+  ],
+  "edited_report": "There is consolidation in the right lower lobe consistent with pneumonia. No pleural effusion is identified. The cardiomediastinal silhouette is within normal limits. No pneumothorax is seen. There may be mild hyperinflation; clinical correlation is recommended to evaluate for COPD.",
+  "clinician_summary": {
+    "summary": "The report is largely well-supported by imaging evidence. Four of five claims are clearly supported. One claim regarding possible COPD has been flagged for hedging.",
+    "key_concerns": ["Claim c5: COPD suggestion requires clinical correlation — rewrite suggested."],
+    "recommendation": "review_recommended",
+    "confidence_note": "Audit performed using MedGemma-4B-IT (mock mode). Image quality was adequate."
+  },
+  "patient_explanation": {
+    "plain_language_summary": "Your chest X-ray shows an area of cloudiness in the lower right part of your lung, which may indicate a lung infection. No fluid around the lungs, no collapsed lung, and no heart enlargement were found. Your doctor may want to discuss whether your lungs show any signs of a breathing condition.",
+    "what_was_found": "An area of cloudiness in the lower right part of your lung.",
+    "what_it_means": "This cloudiness often means there is a lung infection. Your doctor will explain what this means for you.",
+    "next_steps": "Please follow up with your doctor to discuss treatment options."
+  },
+  "pipeline_errors": [],
+  "schema_repairs": [],
+  "results_path": "eval/sample_outputs/mock_results.json"
+}

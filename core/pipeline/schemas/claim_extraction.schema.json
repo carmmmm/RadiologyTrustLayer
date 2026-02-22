@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "ClaimExtraction",
+  "type": "object",
+  "required": ["claims"],
+  "properties": {
+    "claims": {
+      "type": "array",
+      "minItems": 0,
+      "items": {
+        "type": "object",
+        "required": ["claim_id", "text", "sentence_span"],
+        "properties": {
+          "claim_id": { "type": "string" },
+          "text": { "type": "string", "minLength": 5 },
+          "sentence_span": {
+            "type": "object",
+            "required": ["start", "end"],
+            "properties": {
+              "start": { "type": "integer" },
+              "end": { "type": "integer" }
+            }
+          },
+          "claim_type": {
+            "type": "string",
+            "enum": ["finding", "absence", "measurement", "impression", "recommendation", "other"]
+          }
+        }
+      }
+    }
+  }
+}

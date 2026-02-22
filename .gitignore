@@ -1,0 +1,92 @@
+############################
+# macOS
+############################
+.DS_Store
+
+############################
+# Python
+############################
+__pycache__/
+*.py[cod]
+*.pyo
+.Python
+*.egg-info/
+build/
+dist/
+
+############################
+# Virtual environments
+############################
+.env
+.venv/
+venv/
+env/
+
+############################
+# Jupyter
+############################
+.ipynb_checkpoints/
+
+############################
+# Logs / experiment tracking
+############################
+*.log
+wandb/
+
+############################
+# SQLite / local runtime data
+############################
+*.db
+*.sqlite
+*.sqlite3
+*.db-wal
+*.db-shm
+
+# Hugging Face Spaces runtime storage
+spaces_app/storage/
+medgemma/spaces_app/storage/
+
+############################
+# Models & checkpoints (DO NOT COMMIT)
+############################
+*.bin
+*.safetensors
+*.pt
+*.pth
+hf_lora/checkpoints/
+hf_lora/**/checkpoints/
+
+############################
+# IDE / editor files
+############################
+.vscode/
+.idea/
+*.swp
+*.swo
+*.tmp
+
+############################
+# AI assistant artifacts (Claude / Copilot / Cursor / Anthropic)
+############################
+.claude/
+**/.claude/
+claude.*
+*claude*
+anthropic*
+.cursor/
+**/.cursor/
+
+############################
+# OS / temp / backups
+############################
+*.bak
+*.old
+*.tmp
+*.dump
+
+############################
+# Security
+############################
+*.pem
+*.key
+*.crt

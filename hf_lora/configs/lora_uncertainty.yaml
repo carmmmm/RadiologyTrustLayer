@@ -1,0 +1,32 @@
+# LoRA config: Uncertainty calibration adapter
+model_id: google/medgemma-4b-it
+task_type: CAUSAL_LM
+
+lora:
+  r: 8
+  lora_alpha: 16
+  target_modules:
+    - q_proj
+    - v_proj
+  lora_dropout: 0.05
+  bias: none
+
+training:
+  num_train_epochs: 2
+  per_device_train_batch_size: 2
+  gradient_accumulation_steps: 4
+  learning_rate: 1.0e-4
+  warmup_ratio: 0.05
+  lr_scheduler_type: cosine
+  bf16: true
+  max_seq_length: 2048
+  logging_steps: 10
+
+data:
+  train_file: hf_lora/dataset/uncertainty_train.jsonl
+  eval_file: hf_lora/dataset/uncertainty_eval.jsonl
+  objective: uncertainty_calibration
+
+output:
+  output_dir: hf_lora/checkpoints/uncertainty
+  hub_repo: rtl-medgemma-lora-uncertainty
