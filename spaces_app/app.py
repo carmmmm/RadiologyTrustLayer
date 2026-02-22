@@ -852,13 +852,63 @@ def _alert(msg: str, kind: str = "info") -> str:
     return f'<div class="rtl-alert rtl-alert-{kind}">{msg}</div>'
 
 
+# ─────────────────────────── Theme ──────────────────────────────────────
+
+light_theme = gr.themes.Base(
+    primary_hue=gr.themes.colors.blue,
+    neutral_hue=gr.themes.colors.gray,
+    font=["Inter", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
+)
+light_theme.set(
+    body_background_fill="#ffffff",
+    body_background_fill_dark="#ffffff",
+    body_text_color="#202124",
+    body_text_color_dark="#202124",
+    background_fill_primary="#ffffff",
+    background_fill_primary_dark="#ffffff",
+    background_fill_secondary="#f8f9fa",
+    background_fill_secondary_dark="#f8f9fa",
+    block_background_fill="#ffffff",
+    block_background_fill_dark="#ffffff",
+    block_border_color="#e0e0e0",
+    block_border_color_dark="#e0e0e0",
+    block_label_text_color="#202124",
+    block_label_text_color_dark="#202124",
+    block_title_text_color="#202124",
+    block_title_text_color_dark="#202124",
+    input_background_fill="#ffffff",
+    input_background_fill_dark="#ffffff",
+    input_border_color="#dadce0",
+    input_border_color_dark="#dadce0",
+    input_placeholder_color="#9aa0a6",
+    input_placeholder_color_dark="#9aa0a6",
+    table_even_background_fill="#f8f9fa",
+    table_even_background_fill_dark="#f8f9fa",
+    table_odd_background_fill="#ffffff",
+    table_odd_background_fill_dark="#ffffff",
+    border_color_primary="#e0e0e0",
+    border_color_primary_dark="#e0e0e0",
+    panel_background_fill="#f8f9fa",
+    panel_background_fill_dark="#f8f9fa",
+    button_primary_background_fill="#1a73e8",
+    button_primary_background_fill_dark="#1a73e8",
+    button_primary_text_color="#ffffff",
+    button_primary_text_color_dark="#ffffff",
+    button_secondary_background_fill="#ffffff",
+    button_secondary_background_fill_dark="#ffffff",
+    button_secondary_text_color="#202124",
+    button_secondary_text_color_dark="#202124",
+    shadow_drop="none",
+    shadow_drop_lg="none",
+)
+
 # ─────────────────────────── Main Blocks app ─────────────────────────────
 
 def main() -> gr.Blocks:
     ensure_space_storage(storage_dir=STORAGE_DIR, db_path=DB_PATH)
     init_db(DB_PATH, SCHEMA_PATH)
 
-    with gr.Blocks(title=APP_TITLE) as demo:
+    with gr.Blocks(title=APP_TITLE, theme=light_theme, css=RTL_CSS) as demo:
         state = gr.State(_default_state())
 
         # ═══════════════════════════════════════════════════════════════════
@@ -1671,53 +1721,4 @@ def _load_mock_example_md() -> str:
 
 if __name__ == "__main__":
     app = main()
-    # Force light mode — Base() inherits OS dark mode which breaks our white design
-    light_theme = gr.themes.Base(
-        primary_hue=gr.themes.colors.blue,
-        neutral_hue=gr.themes.colors.gray,
-        font=["Inter", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto", "sans-serif"],
-    )
-    # Override the dark mode colors to be the same as light
-    light_theme.set(
-        body_background_fill="#ffffff",
-        body_background_fill_dark="#ffffff",
-        body_text_color="#202124",
-        body_text_color_dark="#202124",
-        background_fill_primary="#ffffff",
-        background_fill_primary_dark="#ffffff",
-        background_fill_secondary="#f8f9fa",
-        background_fill_secondary_dark="#f8f9fa",
-        block_background_fill="#ffffff",
-        block_background_fill_dark="#ffffff",
-        block_border_color="#e0e0e0",
-        block_border_color_dark="#e0e0e0",
-        block_label_text_color="#202124",
-        block_label_text_color_dark="#202124",
-        block_title_text_color="#202124",
-        block_title_text_color_dark="#202124",
-        input_background_fill="#ffffff",
-        input_background_fill_dark="#ffffff",
-        input_border_color="#dadce0",
-        input_border_color_dark="#dadce0",
-        input_placeholder_color="#9aa0a6",
-        input_placeholder_color_dark="#9aa0a6",
-        table_even_background_fill="#f8f9fa",
-        table_even_background_fill_dark="#f8f9fa",
-        table_odd_background_fill="#ffffff",
-        table_odd_background_fill_dark="#ffffff",
-        border_color_primary="#e0e0e0",
-        border_color_primary_dark="#e0e0e0",
-        panel_background_fill="#f8f9fa",
-        panel_background_fill_dark="#f8f9fa",
-        button_primary_background_fill="#1a73e8",
-        button_primary_background_fill_dark="#1a73e8",
-        button_primary_text_color="#ffffff",
-        button_primary_text_color_dark="#ffffff",
-        button_secondary_background_fill="#ffffff",
-        button_secondary_background_fill_dark="#ffffff",
-        button_secondary_text_color="#202124",
-        button_secondary_text_color_dark="#202124",
-        shadow_drop="none",
-        shadow_drop_lg="none",
-    )
-    app.launch(theme=light_theme, css=RTL_CSS)
+    app.launch()
