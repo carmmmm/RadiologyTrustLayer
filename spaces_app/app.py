@@ -674,10 +674,10 @@ button.secondary {
     background: transparent !important;
     border: none !important;
     border-radius: 20px !important;
-    padding: 8px 16px !important;
-    font-size: 0.875rem !important;
-    font-weight: 500 !important;
-    color: #5f6368 !important;
+    padding: 8px 18px !important;
+    font-size: 0.95rem !important;
+    font-weight: 600 !important;
+    color: #3c4043 !important;
     cursor: pointer !important;
     box-shadow: none !important;
     min-width: auto !important;
@@ -688,54 +688,19 @@ button.secondary {
     color: #202124 !important;
 }
 .rtl-nav-logo {
-    font-size: 1.1rem !important;
-    font-weight: 700 !important;
+    font-size: 1.2rem !important;
+    font-weight: 800 !important;
     color: #202124 !important;
     letter-spacing: 0.02em !important;
     margin-right: 12px !important;
 }
 
-/* Nav page info bar */
+/* Nav page info bar — hidden */
 .rtl-nav-page-info {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 4px 28px 16px 28px;
-    font-size: 0.8rem;
-    color: #80868b;
-    line-height: 1.4;
-}
-.rtl-nav-page-info .rtl-page-name {
-    font-weight: 600;
-    color: #202124;
-    font-size: 0.8rem;
-    white-space: nowrap;
+    display: none !important;
 }
 
-/* Pipeline accordions — sleek style */
-.gradio-container .accordion {
-    border: 1.5px solid #dadce0 !important;
-    border-radius: 14px !important;
-    margin-bottom: 4px !important;
-    background: rgba(255,255,255,0.7) !important;
-    overflow: hidden !important;
-}
-.gradio-container .accordion .label-wrap {
-    padding: 10px 14px !important;
-    font-size: 0.82rem !important;
-    font-weight: 500 !important;
-    color: #202124 !important;
-    background: transparent !important;
-}
-.gradio-container .accordion .label-wrap:hover {
-    background: rgba(26,115,232,0.04) !important;
-}
-.gradio-container .accordion .content {
-    padding: 0 14px 12px 14px !important;
-    font-size: 0.8rem !important;
-    color: #5f6368 !important;
-    line-height: 1.6 !important;
-}
+/* Pipeline accordions — hidden, not used */
 
 /* Consistent page height — prevents layout shifts */
 .gradio-container .group {
@@ -1029,20 +994,21 @@ def main() -> gr.Blocks:
                 with gr.Column(scale=1, min_width=280):
                     # Model callout
                     gr.HTML('''<div class="rtl-model-callout"><div class="rtl-model-callout-icon">MG</div><div class="rtl-model-callout-text"><strong>MedGemma 4B + RTL LoRA</strong>Open-weight medical AI with custom fine-tuning</div></div>''')
-                    # Pipeline steps — clickable accordions
-                    gr.HTML('<div class="rtl-pipeline-label">6-Step Audit Pipeline</div>')
-                    with gr.Accordion("1 — Claim Extraction", open=False):
-                        gr.Markdown("Parses the radiology report into individual clinical claims (e.g. \"No pleural effusion\"). Each claim becomes a unit that can be independently verified against the image.")
-                    with gr.Accordion("2 — Image Findings", open=False):
-                        gr.Markdown("MedGemma analyzes the radiology image and generates a structured list of visual findings — what is actually visible in the scan, independent of the report.")
-                    with gr.Accordion("3 — Alignment", open=False):
-                        gr.Markdown("Each extracted claim is compared against the image findings and labeled: *supported*, *uncertain*, *not assessable*, or *needs review*.")
-                    with gr.Accordion("4 — Scoring", open=False):
-                        gr.Markdown("Computes a 0–100 safety score based on alignment labels. Supported claims score high; uncertain and flagged claims reduce the score proportionally.")
-                    with gr.Accordion("5 — Rewrite Suggestions", open=False):
-                        gr.Markdown("Generates alternative phrasing for uncertain or flagged claims using calibrated uncertainty language (e.g. \"may represent\" instead of \"consistent with\").")
-                    with gr.Accordion("6 — Clinician Summary", open=False):
-                        gr.Markdown("Produces an actionable summary for radiologists highlighting key concerns, plus a plain-language patient explanation of the findings.")
+                    # Pipeline steps — static sticker pills
+                    gr.HTML('''<div class="rtl-pipeline-label">6-Step Audit Pipeline</div>
+<div class="rtl-pipeline-steps">
+  <div class="rtl-pipeline-step"><span class="rtl-step-num">1</span> Claim Extraction</div>
+  <div class="rtl-pipeline-connector"></div>
+  <div class="rtl-pipeline-step"><span class="rtl-step-num">2</span> Image Findings</div>
+  <div class="rtl-pipeline-connector"></div>
+  <div class="rtl-pipeline-step"><span class="rtl-step-num">3</span> Alignment</div>
+  <div class="rtl-pipeline-connector"></div>
+  <div class="rtl-pipeline-step"><span class="rtl-step-num">4</span> Scoring</div>
+  <div class="rtl-pipeline-connector"></div>
+  <div class="rtl-pipeline-step"><span class="rtl-step-num">5</span> Rewrite Suggestions</div>
+  <div class="rtl-pipeline-connector"></div>
+  <div class="rtl-pipeline-step"><span class="rtl-step-num">6</span> Clinician Summary</div>
+</div>''')
 
                 with gr.Column(scale=2):
                     gr.Markdown(
@@ -1058,9 +1024,7 @@ def main() -> gr.Blocks:
                     )
                     # Disclaimer
                     gr.HTML('''<div class="rtl-landing-disclaimer"><span class="rtl-disclaimer-badge">Disclaimer</span> This is a research demonstration for the MedGemma Impact Challenge. Not intended for clinical use. Do not upload real patient data. Example cases use public chest X-ray images from the <a href="https://huggingface.co/datasets/hf-vision/chest-xray-pneumonia" target="_blank" style="color:#1a73e8;">chest-xray-pneumonia</a> dataset.</div>''')
-                    # Single CTA
-                    with gr.Row(elem_classes=["rtl-landing-cta-row"]):
-                        landing_cta = gr.Button("View Demo", elem_classes=["rtl-cta-btn"])
+                    # CTA removed — Demo tab in nav handles navigation
             # Metrics strip — full width below
             gr.HTML('''<div class="rtl-metrics-strip"><div class="rtl-metric-item"><div class="rtl-metric-value">96%</div><div class="rtl-metric-label">JSON Schema<br>Compliance</div></div><div class="rtl-metric-item"><div class="rtl-metric-value">89%</div><div class="rtl-metric-label">Label<br>Accuracy</div></div><div class="rtl-metric-item"><div class="rtl-metric-value">6</div><div class="rtl-metric-label">Pipeline<br>Steps</div></div><div class="rtl-metric-item"><div class="rtl-metric-value">4B</div><div class="rtl-metric-label">Model<br>Parameters</div></div></div>''')
             gr.HTML('<div style="text-align:center;font-size:0.75rem;color:#9aa0a6;padding:8px 0 24px 0;">Metrics from 50 synthetic radiology cases. See <strong>Evaluation</strong> tab for full before/after breakdown.</div>')
@@ -1640,18 +1604,16 @@ Always consult qualified radiologists for medical decisions.
             outputs=[state, nav_group, nav_page_info] + _nav_buttons + all_views + _detail_comps,
         )
 
-        # Landing page buttons
-        def _try_demo(st):
+        # Navigation — persistent nav bar
+        nav_home_btn.click(lambda st: go_to("landing", st), inputs=[state], outputs=_shared_nav_outputs)
+
+        # Demo button loads example case into single audit
+        def _demo_click(st):
             nav_out = go_to("single", st)
             img, label, report = _load_example_case(0)
             return nav_out + (img, label, report)
-        landing_cta.click(
-            _try_demo, inputs=[state],
-            outputs=_shared_nav_outputs + [single_image, single_case_label, single_report],
-        )
-        # Navigation — persistent nav bar
-        nav_home_btn.click(lambda st: go_to("landing", st), inputs=[state], outputs=_shared_nav_outputs)
-        nav_demo.click(lambda st: go_to("landing", st), inputs=[state], outputs=_shared_nav_outputs)
+        nav_demo.click(_demo_click, inputs=[state],
+                       outputs=_shared_nav_outputs + [single_image, single_case_label, single_report])
         nav_single.click(lambda st: go_to("single", st), inputs=[state], outputs=_shared_nav_outputs)
         nav_batch.click(lambda st: go_to("batch", st), inputs=[state], outputs=_shared_nav_outputs)
         nav_history.click(lambda st: go_to("history", st), inputs=[state], outputs=_shared_nav_outputs)
