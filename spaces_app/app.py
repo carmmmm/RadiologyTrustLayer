@@ -719,6 +719,32 @@ button.secondary {
     margin: 0;
 }
 
+/* Loading spinner */
+@keyframes rtl-spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+.rtl-loading {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px 20px;
+    background: #e8f0fe;
+    border-radius: 8px;
+    color: #1967d2;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+.rtl-loading-spinner {
+    width: 20px;
+    height: 20px;
+    border: 3px solid #d2e3fc;
+    border-top: 3px solid #1a73e8;
+    border-radius: 50%;
+    animation: rtl-spin 0.8s linear infinite;
+    flex-shrink: 0;
+}
+
 /* Mobile */
 @media (max-width: 768px) {
     .rtl-landing-content {
@@ -886,6 +912,9 @@ def _after_login_data(state: dict) -> tuple[str, list]:
 
 def _alert(msg: str, kind: str = "info") -> str:
     return f'<div class="rtl-alert rtl-alert-{kind}">{msg}</div>'
+
+def _loading_html(msg: str = "Running audit pipeline...") -> str:
+    return f'<div class="rtl-loading"><div class="rtl-loading-spinner"></div>{msg}</div>'
 
 
 # ─────────────────────────── Theme ──────────────────────────────────────
@@ -1642,8 +1671,11 @@ Always consult qualified radiologists for medical decisions.
         nav_settings.click(lambda st: go_to("settings", st), inputs=[state], outputs=_shared_nav_outputs)
         nav_login.click(lambda st: go_to("login", st), inputs=[state], outputs=_shared_nav_outputs)
 
-        # Single audit
+        # Single audit — show loading spinner, then run
         single_run_btn.click(
+            lambda: _loading_html("Running audit pipeline — this may take a minute with real MedGemma..."),
+            outputs=[single_status],
+        ).then(
             run_single_audit,
             inputs=[single_image, single_case_label, single_report, single_lora, state],
             outputs=[
@@ -1661,10 +1693,12 @@ Always consult qualified radiologists for medical decisions.
 
         def run_demo_audit(image, case_label, report, use_lora, st, progress=gr.Progress()):
             result = run_single_audit(image, case_label, report, use_lora, st, progress)
-            # Drop the last element (edited report) — demo doesn't need it
             return result[:-1]
 
         demo_run_btn.click(
+            lambda: _loading_html("Running audit pipeline — this may take a minute with real MedGemma..."),
+            outputs=[demo_status],
+        ).then(
             run_demo_audit,
             inputs=[demo_image, demo_case_label, demo_report, demo_lora, state],
             outputs=[
@@ -1674,8 +1708,11 @@ Always consult qualified radiologists for medical decisions.
             ],
         )
 
-        # Batch audit
+        # Batch audit — show loading spinner, then run
         batch_run_btn.click(
+            lambda: _loading_html("Running batch audit — processing cases..."),
+            outputs=[batch_status],
+        ).then(
             run_batch_audit,
             inputs=[batch_zip, batch_label_box, batch_lora, state],
             outputs=[state, batch_status, batch_summary_md, batch_progress_md, batch_table],
