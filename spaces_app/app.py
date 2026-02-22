@@ -719,6 +719,14 @@ button.secondary {
     margin: 0;
 }
 
+/* Hide Gradio's built-in progress bars — we use our own spinner */
+.gradio-container .progress-bar,
+.gradio-container .progress-text,
+.gradio-container .meta-text,
+.gradio-container .progress-level {
+    display: none !important;
+}
+
 /* Loading spinner */
 @keyframes rtl-spin {
     0% { transform: rotate(0deg); }
@@ -1003,16 +1011,15 @@ def main() -> gr.Blocks:
         # ═══════════════════════════════════════════════════════════════════
         landing_view = gr.Group(visible=True)
         with landing_view:
-            # Header row: MG callout | Title | MedGemma brand — all on one line
-            gr.HTML('''<div style="display:flex;align-items:center;gap:24px;padding:28px 28px 0 28px;">
+            # Top bar: MG callout on left, MedGemma brand on right
+            gr.HTML('''<div style="display:flex;align-items:center;justify-content:space-between;padding:24px 28px 12px 28px;">
   <div class="rtl-model-callout" style="margin:0;flex-shrink:0;">
     <div class="rtl-model-callout-icon">MG</div>
-    <div class="rtl-model-callout-text"><strong>MedGemma 4B + RTL LoRA</strong>Open-weight medical AI</div>
+    <div class="rtl-model-callout-text"><strong>MedGemma 4B + RTL LoRA</strong>Open-weight medical AI with custom fine-tuning</div>
   </div>
-  <h1 style="font-size:2.2rem;font-weight:400;color:#202124;margin:0;letter-spacing:-0.02em;flex:1;">Radiology Trust Layer</h1>
-  <span style="font-size:1.15rem;color:#5f6368;letter-spacing:0.02em;flex-shrink:0;">Med<strong style="color:#202124;font-weight:600;">Gemma</strong></span>
+  <span style="font-size:1.15rem;color:#5f6368;letter-spacing:0.02em;">Med<strong style="color:#202124;font-weight:600;">Gemma</strong></span>
 </div>''')
-            # Two-column layout: pipeline left, description right
+            # Two-column layout: pipeline left, title + description right
             with gr.Row(equal_height=False):
                 with gr.Column(scale=1, min_width=280):
                     gr.HTML('''<div class="rtl-pipeline-label">6-Step Audit Pipeline</div>
@@ -1031,14 +1038,22 @@ def main() -> gr.Blocks:
 </div>''')
                 with gr.Column(scale=2):
                     gr.Markdown(
-                        "A MedGemma-powered auditing system that checks whether radiology "
-                        "reports are faithfully supported by imaging evidence. RTL surfaces "
-                        "where language is well-supported, uncertain, or potentially misleading "
-                        "— without generating diagnoses.\n\n"
-                        "Every claim in a radiology report is extracted, checked against "
-                        "visual findings from the image, and given a trust label. Flagged "
-                        "claims receive suggested rewrites with calibrated uncertainty language. "
-                        "Clinicians get an actionable summary; patients get a plain-language explanation."
+                        "# Radiology Trust Layer\n\n"
+                        "A MedGemma-powered multimodal auditing system that checks whether "
+                        "radiology reports are faithfully supported by imaging evidence. "
+                        "RTL surfaces where clinical language is well-supported, uncertain, "
+                        "or potentially misleading — without generating diagnoses or replacing "
+                        "radiologist judgment.\n\n"
+                        "The system extracts every claim from a free-text radiology report, "
+                        "analyzes the corresponding medical image with MedGemma's vision encoder, "
+                        "and aligns each claim to visual findings. Claims are labeled as "
+                        "*supported*, *uncertain*, *needs review*, or *not assessable*. "
+                        "Flagged claims receive suggested rewrites using calibrated uncertainty "
+                        "language — turning overconfident statements into properly hedged ones. "
+                        "Clinicians get a structured summary highlighting key concerns; "
+                        "patients get an accessible plain-language explanation of the findings.\n\n"
+                        "Built on Google's MedGemma-4B-IT with a custom LoRA adapter "
+                        "fine-tuned for JSON schema compliance and uncertainty calibration."
                     )
             # Large metrics strip — full width, bigger numbers
             gr.HTML('''<div style="display:flex;gap:0;padding:28px 0 12px 0;border-top:1px solid rgba(0,0,0,0.08);margin-top:12px;">
@@ -1384,24 +1399,18 @@ Always consult qualified radiologists for medical decisions.
             detail_vals = _load_detail(run_id.strip())
             return (st,) + _set_views("detail") + detail_vals
 
-        def run_single_audit(image, case_label: str, report: str, use_lora: bool, st: dict, progress=gr.Progress()):
+        def run_single_audit(image, case_label: str, report: str, use_lora: bool, st: dict):
             if image is None or not report.strip():
                 return (st, _alert("Please upload an image and paste a report", "error")) + _single_empty()
 
             try:
                 from core.pipeline.audit_pipeline import run_audit
 
-                progress(0, desc="Starting audit...")
-
-                def _progress_cb(step, total, msg):
-                    progress(step / total, desc=msg)
-
                 result = run_audit(
                     image=image,
                     report_text=report,
                     case_label=case_label or "Untitled",
                     lora_id=config.RTL_LORA_ID if use_lora else "",
-                    progress_cb=_progress_cb,
                 )
 
                 # Persist to DB only if logged in
@@ -1453,7 +1462,6 @@ Always consult qualified radiologists for medical decisions.
 
                 edited = result.get("edited_report", report)
 
-                progress(1.0, desc="Audit complete")
                 status = _alert(
                     f"Audit complete — Run ID: {run_id} — Score: {result['overall_score']}/100 — {result['severity']} severity",
                     "success"
@@ -1472,7 +1480,7 @@ Always consult qualified radiologists for medical decisions.
                 return ""
             return result.get("edited_report", "")
 
-        def run_batch_audit(zip_file, batch_label_str: str, use_lora: bool, st: dict, progress=gr.Progress()):
+        def run_batch_audit(zip_file, batch_label_str: str, use_lora: bool, st: dict):
             if zip_file is None:
                 return st, _alert("Please upload a ZIP file", "error"), "", "", []
 
@@ -1482,10 +1490,7 @@ Always consult qualified radiologists for medical decisions.
                 extract_dir = config.BATCHES_DIR / "tmp_extract"
                 zip_path = Path(zip_file.name)
 
-                def _progress_cb(done, total, msg):
-                    progress(done / total, desc=msg)
-
-                batch_result = run_batch(zip_path, extract_dir, progress_cb=_progress_cb)
+                batch_result = run_batch(zip_path, extract_dir)
                 results = batch_result["results"]
                 summary = batch_result["summary"]
 
@@ -1698,7 +1703,7 @@ Always consult qualified radiologists for medical decisions.
         demo_btn_2.click(lambda: _load_example_case(1), outputs=[demo_image, demo_case_label, demo_report])
         demo_btn_3.click(lambda: _load_example_case(2), outputs=[demo_image, demo_case_label, demo_report])
 
-        def run_demo_audit(image, case_label, report, use_lora, st, progress=gr.Progress()):
+        def run_demo_audit(image, case_label, report, use_lora, st):
             result = run_single_audit(image, case_label, report, use_lora, st, progress)
             return result[:-1]
 
