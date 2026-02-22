@@ -547,10 +547,32 @@ button.secondary {
     font-size: 0.82rem;
     color: #202124;
     font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-wrap: wrap;
 }
 .rtl-pipeline-step:hover {
     border-color: #1a73e8;
     box-shadow: 0 1px 4px rgba(26,115,232,0.12);
+}
+.rtl-step-desc {
+    display: none;
+    width: 100%;
+    padding: 8px 0 2px 38px;
+    font-size: 0.78rem;
+    font-weight: 400;
+    color: #5f6368;
+    line-height: 1.5;
+}
+.rtl-pipeline-step.active {
+    border-color: #1a73e8;
+    background: #f8fbff;
+}
+.rtl-pipeline-step.active .rtl-step-desc {
+    display: block;
+}
+.rtl-pipeline-step.active .rtl-step-num {
+    background: #1a73e8;
 }
 
 .rtl-step-num {
@@ -619,9 +641,9 @@ button.secondary {
 
 /* CTA Button Row */
 .rtl-landing-cta-row {
-    justify-content: center !important;
+    justify-content: flex-start !important;
     gap: 12px !important;
-    padding: 32px 0 40px 0 !important;
+    padding: 8px 0 0 0 !important;
 }
 .rtl-cta-btn {
     background-color: #202124 !important;
@@ -653,40 +675,42 @@ button.secondary {
     background: #f8f9fa !important;
 }
 
-/* Slim Nav Bar (v2) */
+/* Nav Bar (v2) */
 .rtl-nav-bar-v2 {
     display: flex !important;
     align-items: center !important;
-    gap: 2px !important;
-    padding: 8px 12px !important;
-    background: transparent !important;
+    gap: 4px !important;
+    padding: 10px 16px !important;
+    background: #f8f9fa !important;
     border-bottom: 1px solid #e0e0e0 !important;
-    border-radius: 0 !important;
-    margin-bottom: 16px !important;
+    border-radius: 8px 8px 0 0 !important;
+    margin-bottom: 0 !important;
 }
 .rtl-nav-bar-v2 button {
     background: none !important;
     border: none !important;
-    border-radius: 6px !important;
-    padding: 6px 14px !important;
-    font-size: 0.85rem !important;
+    border-radius: 20px !important;
+    padding: 8px 16px !important;
+    font-size: 0.875rem !important;
     font-weight: 500 !important;
     color: #5f6368 !important;
     cursor: pointer !important;
     box-shadow: none !important;
     min-width: auto !important;
+    transition: all 0.15s ease !important;
 }
 .rtl-nav-bar-v2 button:hover {
-    background: #f1f3f4 !important;
+    background: #e8eaed !important;
     color: #202124 !important;
 }
 .rtl-nav-logo {
     font-size: 1rem !important;
-    font-weight: 600 !important;
+    font-weight: 700 !important;
     color: #202124 !important;
-    border-right: 1px solid #e0e0e0 !important;
-    margin-right: 6px !important;
-    padding-right: 14px !important;
+    border-right: 1px solid #dadce0 !important;
+    margin-right: 8px !important;
+    padding-right: 16px !important;
+    letter-spacing: 0.02em !important;
 }
 
 /* Nav page info bar */
@@ -707,6 +731,38 @@ button.secondary {
     border-radius: 12px;
     font-size: 0.8rem;
     white-space: nowrap;
+}
+
+/* Dummy history overlay */
+.rtl-history-placeholder {
+    position: relative;
+    margin-top: 16px;
+}
+.rtl-history-placeholder table {
+    opacity: 0.35;
+    pointer-events: none;
+}
+.rtl-history-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    border: 1px solid #dadce0;
+    border-radius: 12px;
+    padding: 24px 32px;
+    text-align: center;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    z-index: 5;
+}
+.rtl-history-overlay h3 {
+    font-size: 1rem !important;
+    margin: 0 0 8px 0 !important;
+}
+.rtl-history-overlay p {
+    color: #5f6368;
+    font-size: 0.85rem;
+    margin: 0;
 }
 
 /* Mobile */
@@ -951,18 +1007,37 @@ def main() -> gr.Blocks:
                   </div>
 
                   <div class="rtl-pipeline-label">6-Step Audit Pipeline</div>
+                  <div class="rtl-pipeline-label" style="font-size:0.72rem;font-weight:400;color:#9aa0a6;margin-top:-8px;">Click a step to learn more</div>
                   <div class="rtl-pipeline-steps">
-                    <div class="rtl-pipeline-step"><span class="rtl-step-num">1</span> Claim Extraction</div>
+                    <div class="rtl-pipeline-step" onclick="this.classList.toggle('active')">
+                      <span class="rtl-step-num">1</span> Claim Extraction
+                      <div class="rtl-step-desc">Parses the radiology report into individual clinical claims (e.g. &ldquo;No pleural effusion&rdquo;). Each claim becomes a unit that can be independently verified against the image.</div>
+                    </div>
                     <div class="rtl-pipeline-connector"></div>
-                    <div class="rtl-pipeline-step"><span class="rtl-step-num">2</span> Image Findings</div>
+                    <div class="rtl-pipeline-step" onclick="this.classList.toggle('active')">
+                      <span class="rtl-step-num">2</span> Image Findings
+                      <div class="rtl-step-desc">MedGemma analyzes the radiology image and generates a structured list of visual findings &mdash; what is actually visible in the scan, independent of the report.</div>
+                    </div>
                     <div class="rtl-pipeline-connector"></div>
-                    <div class="rtl-pipeline-step"><span class="rtl-step-num">3</span> Alignment</div>
+                    <div class="rtl-pipeline-step" onclick="this.classList.toggle('active')">
+                      <span class="rtl-step-num">3</span> Alignment
+                      <div class="rtl-step-desc">Each extracted claim is compared against the image findings and labeled: <em>supported</em>, <em>uncertain</em>, <em>not assessable</em>, or <em>needs review</em>.</div>
+                    </div>
                     <div class="rtl-pipeline-connector"></div>
-                    <div class="rtl-pipeline-step"><span class="rtl-step-num">4</span> Scoring</div>
+                    <div class="rtl-pipeline-step" onclick="this.classList.toggle('active')">
+                      <span class="rtl-step-num">4</span> Scoring
+                      <div class="rtl-step-desc">Computes a 0&ndash;100 safety score based on alignment labels. Supported claims score high; uncertain and flagged claims reduce the score proportionally.</div>
+                    </div>
                     <div class="rtl-pipeline-connector"></div>
-                    <div class="rtl-pipeline-step"><span class="rtl-step-num">5</span> Rewrite Suggestions</div>
+                    <div class="rtl-pipeline-step" onclick="this.classList.toggle('active')">
+                      <span class="rtl-step-num">5</span> Rewrite Suggestions
+                      <div class="rtl-step-desc">Generates alternative phrasing for uncertain or flagged claims using calibrated uncertainty language (e.g. &ldquo;may represent&rdquo; instead of &ldquo;consistent with&rdquo;).</div>
+                    </div>
                     <div class="rtl-pipeline-connector"></div>
-                    <div class="rtl-pipeline-step"><span class="rtl-step-num">6</span> Clinician Summary</div>
+                    <div class="rtl-pipeline-step" onclick="this.classList.toggle('active')">
+                      <span class="rtl-step-num">6</span> Clinician Summary
+                      <div class="rtl-step-desc">Produces an actionable summary for radiologists highlighting key concerns, plus a plain-language patient explanation of the findings.</div>
+                    </div>
                   </div>
                 </div>
 
@@ -980,32 +1055,6 @@ def main() -> gr.Blocks:
                   claims receive suggested rewrites with calibrated uncertainty language.
                   Clinicians get an actionable summary; patients get a plain-language
                   explanation.</p>
-
-                  <div class="rtl-metrics-strip">
-                    <div class="rtl-metric-item">
-                      <div class="rtl-metric-value">96%</div>
-                      <div class="rtl-metric-label">JSON Schema<br>Compliance</div>
-                    </div>
-                    <div class="rtl-metric-item">
-                      <div class="rtl-metric-value">89%</div>
-                      <div class="rtl-metric-label">Label<br>Accuracy</div>
-                    </div>
-                    <div class="rtl-metric-item">
-                      <div class="rtl-metric-value">6</div>
-                      <div class="rtl-metric-label">Pipeline<br>Steps</div>
-                    </div>
-                    <div class="rtl-metric-item">
-                      <div class="rtl-metric-value">4B</div>
-                      <div class="rtl-metric-label">Model<br>Parameters</div>
-                    </div>
-                  </div>
-
-                  <div class="rtl-landing-disclaimer">
-                    <span class="rtl-disclaimer-badge">Disclaimer</span>
-                    This is a research demonstration for the MedGemma Impact Challenge.
-                    It is not intended for clinical use. Do not upload real patient data.
-                    All example cases use public chest X-ray images.
-                  </div>
                 </div>
               </div>
             </div>
@@ -1013,6 +1062,41 @@ def main() -> gr.Blocks:
             with gr.Row(elem_classes=["rtl-landing-cta-row"]):
                 landing_cta = gr.Button("Try Demo", elem_classes=["rtl-cta-btn"])
                 landing_login = gr.Button("Log In", elem_classes=["rtl-cta-secondary"])
+            gr.HTML('''
+            <div class="rtl-landing" style="padding-top:0;min-height:auto;">
+              <div class="rtl-metrics-strip">
+                <div class="rtl-metric-item">
+                  <div class="rtl-metric-value">96%</div>
+                  <div class="rtl-metric-label">JSON Schema<br>Compliance</div>
+                </div>
+                <div class="rtl-metric-item">
+                  <div class="rtl-metric-value">89%</div>
+                  <div class="rtl-metric-label">Label<br>Accuracy</div>
+                </div>
+                <div class="rtl-metric-item">
+                  <div class="rtl-metric-value">6</div>
+                  <div class="rtl-metric-label">Pipeline<br>Steps</div>
+                </div>
+                <div class="rtl-metric-item">
+                  <div class="rtl-metric-value">4B</div>
+                  <div class="rtl-metric-label">Model<br>Parameters</div>
+                </div>
+              </div>
+
+              <div class="rtl-landing-disclaimer">
+                <span class="rtl-disclaimer-badge">Disclaimer</span>
+                This is a research demonstration for the MedGemma Impact Challenge.
+                It is not intended for clinical use. Do not upload real patient data.
+                All example cases use public chest X-ray images from the
+                <a href="https://huggingface.co/datasets/hf-vision/chest-xray-pneumonia" target="_blank" style="color:#1a73e8;">chest-xray-pneumonia</a> dataset.
+              </div>
+              <div style="margin-top:12px;font-size:0.78rem;color:#9aa0a6;line-height:1.6;">
+                Metrics measured on 50 synthetic radiology cases comparing MedGemma-4B-IT base vs. RTL LoRA adapter.
+                96% JSON schema compliance and 89% label accuracy are post-LoRA results.
+                See the <strong>Evaluation</strong> tab for full before/after breakdown.
+              </div>
+            </div>
+            ''')
 
         # ═══════════════════════════════════════════════════════════════════
         # LOGIN VIEW
@@ -1188,7 +1272,28 @@ def main() -> gr.Blocks:
         history_view = gr.Group(visible=False)
         with history_view:
             gr.Markdown("## Audit History")
-            gr.HTML('<div class="rtl-alert rtl-alert-info">Log in to save and access your audit history across sessions.</div>')
+            hist_placeholder = gr.HTML('''
+            <div class="rtl-history-placeholder">
+              <table class="rtl-table" style="width:100%;">
+                <thead><tr>
+                  <th class="rtl-th">Date</th><th class="rtl-th">Case Label</th>
+                  <th class="rtl-th">Score</th><th class="rtl-th">Severity</th>
+                  <th class="rtl-th">Model</th><th class="rtl-th">Run ID</th>
+                </tr></thead>
+                <tbody>
+                  <tr><td class="rtl-td">2026-02-22 14:32</td><td class="rtl-td">CXR - Right lower lobe</td><td class="rtl-td">82</td><td class="rtl-td">Low</td><td class="rtl-td">medgemma-4b-it</td><td class="rtl-td">a1b2c3d4</td></tr>
+                  <tr><td class="rtl-td">2026-02-22 13:15</td><td class="rtl-td">CXR - CHF evaluation</td><td class="rtl-td">61</td><td class="rtl-td">Medium</td><td class="rtl-td">medgemma-4b-it</td><td class="rtl-td">e5f6g7h8</td></tr>
+                  <tr><td class="rtl-td">2026-02-21 09:48</td><td class="rtl-td">CXR - Normal study</td><td class="rtl-td">94</td><td class="rtl-td">Low</td><td class="rtl-td">medgemma-4b-it</td><td class="rtl-td">i9j0k1l2</td></tr>
+                  <tr><td class="rtl-td">2026-02-20 16:22</td><td class="rtl-td">CXR - Pleural effusion</td><td class="rtl-td">45</td><td class="rtl-td">High</td><td class="rtl-td">medgemma-4b-it</td><td class="rtl-td">m3n4o5p6</td></tr>
+                  <tr><td class="rtl-td">2026-02-20 11:05</td><td class="rtl-td">CXR - Pneumothorax</td><td class="rtl-td">73</td><td class="rtl-td">Medium</td><td class="rtl-td">medgemma-4b-it</td><td class="rtl-td">q7r8s9t0</td></tr>
+                </tbody>
+              </table>
+              <div class="rtl-history-overlay">
+                <h3>You are not logged in</h3>
+                <p>Log in or create an account to save your<br>audit history and access it across sessions.</p>
+              </div>
+            </div>
+            ''')
             with gr.Row():
                 hist_filter_sev = gr.Dropdown(choices=["All", "low", "medium", "high"], value="All", label="Severity")
                 hist_filter_score = gr.Slider(0, 100, 0, step=5, label="Min score")
@@ -1196,7 +1301,7 @@ def main() -> gr.Blocks:
             hist_table = gr.Dataframe(
                 headers=["Date", "Case Label", "Score", "Severity", "Model", "Run ID"],
                 datatype=["str", "str", "number", "str", "str", "str"],
-                interactive=False, wrap=True,
+                interactive=False, wrap=True, visible=False,
             )
             with gr.Row():
                 hist_run_id_box = gr.Textbox(label="Run ID to open")
@@ -1456,7 +1561,7 @@ Always consult qualified radiologists for medical decisions.
 
         def load_history(severity_filter: str, min_score: int, st: dict):
             if not st.get("user_id"):
-                return []
+                return gr.update(visible=True), gr.update(visible=False, value=[])
             conn = get_conn(DB_PATH)
             runs = list_all_runs_for_user(conn, st["user_id"])
             rows = []
@@ -1469,7 +1574,7 @@ Always consult qualified radiologists for medical decisions.
                     r["created_at"], r["case_label"], r["overall_score"],
                     r["severity"], r["model_version"], r["run_id"]
                 ])
-            return rows
+            return gr.update(visible=False), gr.update(visible=True, value=rows)
 
         def export_run(st: dict):
             result = st.get("current_result")
@@ -1637,7 +1742,7 @@ Always consult qualified radiologists for medical decisions.
         hist_refresh.click(
             load_history,
             inputs=[hist_filter_sev, hist_filter_score, state],
-            outputs=[hist_table],
+            outputs=[hist_placeholder, hist_table],
         )
 
         # Export
