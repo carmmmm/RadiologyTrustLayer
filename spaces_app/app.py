@@ -55,8 +55,9 @@ RTL_CSS = """
 
 .gradio-container {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
-    max-width: 1200px !important;
+    max-width: 1400px !important;
     margin: 0 auto !important;
+    padding: 0 !important;
 }
 
 /* Tab styling */
@@ -389,11 +390,22 @@ button.secondary {
 /* Login Container */
 .rtl-login-wrap { max-width: 420px; margin: 40px auto; }
 
-/* Remove borders and padding from hidden groups (fixes divider lines) */
-.gradio-container .group {
+/* Remove ALL group borders/backgrounds for seamless look */
+.gradio-container .group,
+.gradio-container .gr-group,
+.gradio-container > .contain > div {
     border: none !important;
     padding: 0 !important;
     background: none !important;
+    box-shadow: none !important;
+}
+
+/* Seamless full-width background */
+.gradio-container {
+    background: linear-gradient(180deg, #f0f2f5 0%, #e8eaed 40%, #f8f9fa 100%) !important;
+}
+.main, .wrap, .contain {
+    background: transparent !important;
 }
 
 /* Demo card buttons — styled as clickable cards */
@@ -578,10 +590,9 @@ button.secondary {
 .rtl-metrics-strip {
     display: flex;
     gap: 32px;
-    margin: 28px 0;
-    padding: 20px 0;
-    border-top: 1px solid #e0e0e0;
-    border-bottom: 1px solid #e0e0e0;
+    margin: 16px 0 0 0;
+    padding: 24px 40px;
+    border-top: 1px solid rgba(0,0,0,0.06);
 }
 .rtl-metric-item { text-align: center; flex: 1; }
 .rtl-metric-value {
@@ -599,8 +610,8 @@ button.secondary {
 
 /* Disclaimer Badge */
 .rtl-landing-disclaimer {
-    margin: 24px 0 0 0;
-    font-size: 0.85rem;
+    margin: 20px 0 0 0;
+    font-size: 0.82rem;
     line-height: 1.7;
     color: #5f6368;
 }
@@ -621,7 +632,7 @@ button.secondary {
 .rtl-landing-cta-row {
     justify-content: flex-start !important;
     gap: 12px !important;
-    padding: 8px 0 0 0 !important;
+    padding: 24px 0 16px 0 !important;
 }
 .rtl-cta-btn {
     background-color: #202124 !important;
@@ -653,19 +664,19 @@ button.secondary {
     background: #f8f9fa !important;
 }
 
-/* Nav Bar (v2) */
+/* Nav Bar — seamless, no background */
 .rtl-nav-bar-v2 {
     display: flex !important;
     align-items: center !important;
     gap: 4px !important;
-    padding: 10px 16px !important;
-    background: #f8f9fa !important;
-    border-bottom: 1px solid #e0e0e0 !important;
-    border-radius: 8px 8px 0 0 !important;
+    padding: 16px 24px 8px 24px !important;
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
     margin-bottom: 0 !important;
 }
 .rtl-nav-bar-v2 button {
-    background: none !important;
+    background: transparent !important;
     border: none !important;
     border-radius: 20px !important;
     padding: 8px 16px !important;
@@ -678,17 +689,15 @@ button.secondary {
     transition: all 0.15s ease !important;
 }
 .rtl-nav-bar-v2 button:hover {
-    background: #e8eaed !important;
+    background: rgba(0,0,0,0.05) !important;
     color: #202124 !important;
 }
 .rtl-nav-logo {
-    font-size: 1rem !important;
+    font-size: 1.1rem !important;
     font-weight: 700 !important;
     color: #202124 !important;
-    border-right: 1px solid #dadce0 !important;
-    margin-right: 8px !important;
-    padding-right: 16px !important;
     letter-spacing: 0.02em !important;
+    margin-right: 12px !important;
 }
 
 /* Nav page info bar */
@@ -696,17 +705,14 @@ button.secondary {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 8px 16px 12px 16px;
-    font-size: 0.82rem;
-    color: #5f6368;
+    padding: 4px 28px 16px 28px;
+    font-size: 0.8rem;
+    color: #80868b;
     line-height: 1.4;
 }
 .rtl-nav-page-info .rtl-page-name {
     font-weight: 600;
-    color: #1a73e8;
-    background: #e8f0fe;
-    padding: 3px 12px;
-    border-radius: 12px;
+    color: #202124;
     font-size: 0.8rem;
     white-space: nowrap;
 }
@@ -990,35 +996,16 @@ def main() -> gr.Blocks:
         # ═══════════════════════════════════════════════════════════════════
         landing_view = gr.Group(visible=True)
         with landing_view:
-            # Header + branding
-            gr.HTML('<div style="text-align:right;padding:0 20px 16px 0;"><span style="font-size:1.1rem;color:#5f6368;letter-spacing:0.02em;">Med<strong style="color:#202124;font-weight:600;">Gemma</strong></span></div>')
-            # CTA buttons at top
-            with gr.Row(elem_classes=["rtl-landing-cta-row"]):
-                landing_cta = gr.Button("Try Demo", elem_classes=["rtl-cta-btn"])
-                landing_login = gr.Button("Log In", elem_classes=["rtl-cta-secondary"])
-            # Left column: diagram, Right column: text
-            with gr.Row():
-                with gr.Column(scale=1, min_width=300):
+            # Branding top-right
+            gr.HTML('<div style="text-align:right;padding:24px 28px 0 0;"><span style="font-size:1.15rem;color:#5f6368;letter-spacing:0.02em;">Med<strong style="color:#202124;font-weight:600;">Gemma</strong></span></div>')
+            # Two-column layout: diagram left, text right
+            with gr.Row(equal_height=False):
+                with gr.Column(scale=1, min_width=280):
                     # Model callout
-                    gr.HTML('''<div class="rtl-model-callout">
-<div class="rtl-model-callout-icon">MG</div>
-<div class="rtl-model-callout-text"><strong>MedGemma 4B + RTL LoRA</strong>Open-weight medical AI with custom fine-tuning</div>
-</div>''')
-                    # Pipeline steps — pure CSS, no onclick
-                    gr.HTML('''<div class="rtl-pipeline-label">6-Step Audit Pipeline</div>
-<div class="rtl-pipeline-steps">
-<div class="rtl-pipeline-step"><span class="rtl-step-num">1</span> Claim Extraction</div>
-<div class="rtl-pipeline-connector"></div>
-<div class="rtl-pipeline-step"><span class="rtl-step-num">2</span> Image Findings</div>
-<div class="rtl-pipeline-connector"></div>
-<div class="rtl-pipeline-step"><span class="rtl-step-num">3</span> Alignment</div>
-<div class="rtl-pipeline-connector"></div>
-<div class="rtl-pipeline-step"><span class="rtl-step-num">4</span> Scoring</div>
-<div class="rtl-pipeline-connector"></div>
-<div class="rtl-pipeline-step"><span class="rtl-step-num">5</span> Rewrite Suggestions</div>
-<div class="rtl-pipeline-connector"></div>
-<div class="rtl-pipeline-step"><span class="rtl-step-num">6</span> Clinician Summary</div>
-</div>''')
+                    gr.HTML('''<div class="rtl-model-callout"><div class="rtl-model-callout-icon">MG</div><div class="rtl-model-callout-text"><strong>MedGemma 4B + RTL LoRA</strong>Open-weight medical AI with custom fine-tuning</div></div>''')
+                    # Pipeline diagram
+                    gr.HTML('''<div class="rtl-pipeline-label">6-Step Audit Pipeline</div><div class="rtl-pipeline-steps"><div class="rtl-pipeline-step"><span class="rtl-step-num">1</span> Claim Extraction</div><div class="rtl-pipeline-connector"></div><div class="rtl-pipeline-step"><span class="rtl-step-num">2</span> Image Findings</div><div class="rtl-pipeline-connector"></div><div class="rtl-pipeline-step"><span class="rtl-step-num">3</span> Alignment</div><div class="rtl-pipeline-connector"></div><div class="rtl-pipeline-step"><span class="rtl-step-num">4</span> Scoring</div><div class="rtl-pipeline-connector"></div><div class="rtl-pipeline-step"><span class="rtl-step-num">5</span> Rewrite Suggestions</div><div class="rtl-pipeline-connector"></div><div class="rtl-pipeline-step"><span class="rtl-step-num">6</span> Clinician Summary</div></div>''')
+
                 with gr.Column(scale=2):
                     gr.Markdown(
                         "# Radiology Trust Layer\n\n"
@@ -1031,25 +1018,14 @@ def main() -> gr.Blocks:
                         "claims receive suggested rewrites with calibrated uncertainty language. "
                         "Clinicians get an actionable summary; patients get a plain-language explanation."
                     )
-                    # Metrics strip
-                    gr.HTML('''<div class="rtl-metrics-strip">
-<div class="rtl-metric-item"><div class="rtl-metric-value">96%</div><div class="rtl-metric-label">JSON Schema<br>Compliance</div></div>
-<div class="rtl-metric-item"><div class="rtl-metric-value">89%</div><div class="rtl-metric-label">Label<br>Accuracy</div></div>
-<div class="rtl-metric-item"><div class="rtl-metric-value">6</div><div class="rtl-metric-label">Pipeline<br>Steps</div></div>
-<div class="rtl-metric-item"><div class="rtl-metric-value">4B</div><div class="rtl-metric-label">Model<br>Parameters</div></div>
-</div>''')
                     # Disclaimer
-                    gr.HTML('''<div class="rtl-landing-disclaimer">
-<span class="rtl-disclaimer-badge">Disclaimer</span>
-This is a research demonstration for the MedGemma Impact Challenge.
-Not intended for clinical use. Do not upload real patient data.
-Example cases use public chest X-ray images from the
-<a href="https://huggingface.co/datasets/hf-vision/chest-xray-pneumonia" target="_blank" style="color:#1a73e8;">chest-xray-pneumonia</a> dataset.
-</div>
-<div style="margin-top:10px;font-size:0.78rem;color:#9aa0a6;line-height:1.6;">
-Metrics from 50 synthetic radiology cases comparing MedGemma-4B-IT base vs. RTL LoRA adapter.
-See the <strong>Evaluation</strong> tab for full before/after breakdown.
-</div>''')
+                    gr.HTML('''<div class="rtl-landing-disclaimer"><span class="rtl-disclaimer-badge">Disclaimer</span> This is a research demonstration for the MedGemma Impact Challenge. Not intended for clinical use. Do not upload real patient data. Example cases use public chest X-ray images from the <a href="https://huggingface.co/datasets/hf-vision/chest-xray-pneumonia" target="_blank" style="color:#1a73e8;">chest-xray-pneumonia</a> dataset.</div>''')
+                    # Single CTA
+                    with gr.Row(elem_classes=["rtl-landing-cta-row"]):
+                        landing_cta = gr.Button("View Demo", elem_classes=["rtl-cta-btn"])
+            # Metrics strip — full width below
+            gr.HTML('''<div class="rtl-metrics-strip"><div class="rtl-metric-item"><div class="rtl-metric-value">96%</div><div class="rtl-metric-label">JSON Schema<br>Compliance</div></div><div class="rtl-metric-item"><div class="rtl-metric-value">89%</div><div class="rtl-metric-label">Label<br>Accuracy</div></div><div class="rtl-metric-item"><div class="rtl-metric-value">6</div><div class="rtl-metric-label">Pipeline<br>Steps</div></div><div class="rtl-metric-item"><div class="rtl-metric-value">4B</div><div class="rtl-metric-label">Model<br>Parameters</div></div></div>''')
+            gr.HTML('<div style="text-align:center;font-size:0.75rem;color:#9aa0a6;padding:8px 0 24px 0;">Metrics from 50 synthetic radiology cases. See <strong>Evaluation</strong> tab for full before/after breakdown.</div>')
 
         # ═══════════════════════════════════════════════════════════════════
         # LOGIN VIEW
@@ -1635,8 +1611,6 @@ Always consult qualified radiologists for medical decisions.
             _try_demo, inputs=[state],
             outputs=_shared_nav_outputs + [single_image, single_case_label, single_report],
         )
-        landing_login.click(lambda st: go_to("login", st), inputs=[state], outputs=_shared_nav_outputs)
-
         # Navigation — persistent nav bar
         nav_home_btn.click(lambda st: go_to("landing", st), inputs=[state], outputs=_shared_nav_outputs)
         nav_single.click(lambda st: go_to("single", st), inputs=[state], outputs=_shared_nav_outputs)
