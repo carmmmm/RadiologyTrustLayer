@@ -16,6 +16,13 @@ A MedGemma-powered multimodal auditing system that checks whether radiology repo
 
 Built for the [MedGemma Impact Challenge](https://www.kaggle.com/competitions/medgemma-impact-challenge) on Kaggle.
 
+**Why MedGemma**
+
+- RTL requires joint image + language reasoning (report claims must be checked against visual evidence)
+- Text-only models cannot verify image-grounded claims
+- Vision-only models cannot assess uncertainty phrasing or claim specificity in reports
+- MedGemma’s open-weight multimodal design enables reproducible, privacy-conscious deployment
+
 ## Links
 
 | Resource | URL |
