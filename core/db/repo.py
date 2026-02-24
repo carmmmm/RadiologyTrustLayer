@@ -11,6 +11,7 @@ from core.util.time import utcnow_iso
 # ─────────────────────────────── USERS ────────────────────────────────────
 
 def create_user(conn: sqlite3.Connection, email: str, display_name: str, password: str) -> str:
+    """Create a new user account and return the generated user_id."""
     user_id = new_user_id()
     pw_hash = bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
     conn.execute(
@@ -22,6 +23,7 @@ def create_user(conn: sqlite3.Connection, email: str, display_name: str, passwor
 
 
 def authenticate_user(conn: sqlite3.Connection, email: str, password: str) -> Optional[str]:
+    """Verify credentials and return user_id on success, None on failure."""
     row = conn.execute("SELECT user_id, password_hash FROM users WHERE email=?", (email,)).fetchone()
     if row is None:
         return None
@@ -31,6 +33,7 @@ def authenticate_user(conn: sqlite3.Connection, email: str, password: str) -> Op
 
 
 def get_user_display_name(conn: sqlite3.Connection, user_id: str) -> Optional[str]:
+    """Look up a user's display name by user_id."""
     row = conn.execute("SELECT display_name FROM users WHERE user_id=?", (user_id,)).fetchone()
     return row["display_name"] if row else None
 
@@ -55,6 +58,7 @@ def create_run(
     error_message: str = "",
     results_path: str,
 ) -> str:
+    """Persist a completed audit run to the database and return the generated run_id."""
     run_id = new_run_id()
     conn.execute(
         """INSERT INTO runs
@@ -74,6 +78,7 @@ def create_run(
 
 
 def get_run(conn: sqlite3.Connection, run_id: str) -> Optional[dict]:
+    """Fetch a single run by ID, returning None if not found."""
     row = conn.execute("SELECT * FROM runs WHERE run_id=?", (run_id,)).fetchone()
     if row is None:
         return None
@@ -83,6 +88,7 @@ def get_run(conn: sqlite3.Connection, run_id: str) -> Optional[dict]:
 
 
 def list_recent_runs_for_user(conn: sqlite3.Connection, user_id: str, limit: int = 20) -> list:
+    """Return the most recent runs for a user as flat row lists (for Dataframe display)."""
     rows = conn.execute(
         "SELECT created_at, case_label, overall_score, severity, run_id "
         "FROM runs WHERE user_id=? ORDER BY created_at DESC LIMIT ?",
@@ -92,6 +98,7 @@ def list_recent_runs_for_user(conn: sqlite3.Connection, user_id: str, limit: int
 
 
 def list_all_runs_for_user(conn: sqlite3.Connection, user_id: str) -> list[dict]:
+    """Return all runs for a user as fully parsed dicts."""
     rows = conn.execute(
         "SELECT * FROM runs WHERE user_id=? ORDER BY created_at DESC", (user_id,)
     ).fetchall()
@@ -112,6 +119,7 @@ def create_batch(
     zip_name: str,
     num_cases_total: int,
 ) -> str:
+    """Create a new batch record and return the generated batch_id."""
     batch_id = new_batch_id()
     conn.execute(
         """INSERT INTO batches
@@ -132,6 +140,7 @@ def update_batch_progress(
     summary: dict,
     status: str = "running",
 ) -> None:
+    """Update batch progress counters and summary statistics."""
     conn.execute(
         """UPDATE batches SET num_cases_done=?, num_cases_failed=?,
            batch_summary_json=?, status=? WHERE batch_id=?""",
@@ -141,6 +150,7 @@ def update_batch_progress(
 
 
 def link_batch_run(conn: sqlite3.Connection, batch_id: str, run_id: str, case_id: str) -> None:
+    """Associate a completed run with its parent batch."""
     conn.execute(
         "INSERT OR IGNORE INTO batch_runs (batch_id, run_id, case_id) VALUES (?,?,?)",
         (batch_id, run_id, case_id),
@@ -149,6 +159,7 @@ def link_batch_run(conn: sqlite3.Connection, batch_id: str, run_id: str, case_id
 
 
 def get_batch(conn: sqlite3.Connection, batch_id: str) -> Optional[dict]:
+    """Fetch a batch record by ID, returning None if not found."""
     row = conn.execute("SELECT * FROM batches WHERE batch_id=?", (batch_id,)).fetchone()
     if row is None:
         return None
@@ -158,6 +169,7 @@ def get_batch(conn: sqlite3.Connection, batch_id: str) -> Optional[dict]:
 
 
 def list_batch_runs(conn: sqlite3.Connection, batch_id: str) -> list[dict]:
+    """Return all runs belonging to a batch, joined with case_id."""
     rows = conn.execute(
         """SELECT r.*, br.case_id FROM runs r
            JOIN batch_runs br ON r.run_id=br.run_id
@@ -181,6 +193,7 @@ def log_event(
     event_type: str,
     details: dict,
 ) -> str:
+    """Record an audit trail event and return the generated event_id."""
     event_id = new_event_id()
     conn.execute(
         "INSERT INTO audit_events (event_id, run_id, timestamp, actor, event_type, details_json) VALUES (?,?,?,?,?,?)",
@@ -191,6 +204,7 @@ def log_event(
 
 
 def list_events_for_run(conn: sqlite3.Connection, run_id: str) -> list[dict]:
+    """Return all audit events for a run, ordered by timestamp."""
     rows = conn.execute(
         "SELECT * FROM audit_events WHERE run_id=? ORDER BY timestamp", (run_id,)
     ).fetchall()

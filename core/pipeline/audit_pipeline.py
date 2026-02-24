@@ -14,7 +14,7 @@ Returns a fully structured AuditResult dict and persists it to disk.
 import json
 import logging
 from pathlib import Path
-from typing import Optional, Generator
+from typing import Optional
 
 from PIL import Image
 
@@ -76,7 +76,7 @@ def run_audit(
     prompt = _load_prompt(
         "claim_extraction",
         report_text=report_text,
-        schema=open(SCHEMAS / "claim_extraction.schema.json").read(),
+        schema=read_text(SCHEMAS / "claim_extraction.schema.json"),
     )
     claims_result, errs = mgc.infer_structured(
         prompt=prompt,
@@ -93,7 +93,7 @@ def run_audit(
     progress(2, "Analyzing image for visual findings...")
     prompt = _load_prompt(
         "image_findings",
-        schema=open(SCHEMAS / "image_findings.schema.json").read(),
+        schema=read_text(SCHEMAS / "image_findings.schema.json"),
     )
     findings_result, errs = mgc.infer_structured(
         prompt=prompt,
@@ -113,7 +113,7 @@ def run_audit(
         "alignment",
         claims_json=json.dumps(claims, indent=2),
         findings_json=json.dumps(findings, indent=2),
-        schema=open(SCHEMAS / "alignment.schema.json").read(),
+        schema=read_text(SCHEMAS / "alignment.schema.json"),
     )
     alignment_result, errs = mgc.infer_structured(
         prompt=prompt,
@@ -143,7 +143,7 @@ def run_audit(
         "rewrite",
         report_text=report_text,
         alignment_json=json.dumps(flagged, indent=2),
-        schema=open(SCHEMAS / "rewrite.schema.json").read(),
+        schema=read_text(SCHEMAS / "rewrite.schema.json"),
     )
     rewrite_result, errs = mgc.infer_structured(
         prompt=prompt,
@@ -163,7 +163,7 @@ def run_audit(
         severity=severity,
         flag_counts_json=json.dumps(flag_counts),
         flagged_claims_json=json.dumps(flagged_claims, indent=2),
-        schema=open(SCHEMAS / "clinician_summary.schema.json").read(),
+        schema=read_text(SCHEMAS / "clinician_summary.schema.json"),
     )
     summary_result, errs = mgc.infer_structured(
         prompt=prompt,
@@ -181,7 +181,7 @@ def run_audit(
     prompt = _load_prompt(
         "patient_explain",
         report_text=edited_report,
-        schema=open(SCHEMAS / "patient_explain.schema.json").read(),
+        schema=read_text(SCHEMAS / "patient_explain.schema.json"),
     )
     patient_result, errs = mgc.infer_structured(
         prompt=prompt,

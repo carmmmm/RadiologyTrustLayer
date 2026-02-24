@@ -57,7 +57,6 @@ OVERCONFIDENT_PHRASES = [
 
 def make_alignment_example(n_claims: int = 4) -> dict:
     claims = [make_claim(i) for i in range(n_claims)]
-    claim_map = {c["claim_id"]: c for c in claims}
     alignments = []
     for claim in claims:
         label = random.choices(LABELS, weights=[0.5, 0.3, 0.2])[0]

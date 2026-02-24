@@ -5,7 +5,14 @@ Provides rendering functions for the score gauge, flag counts,
 claim analysis table, and rewrite suggestion cards. All components
 follow the RTL design system (Google-inspired Material style).
 """
+import html as _html
+
 from core.scoring.score import label_badge
+
+
+def _esc(text: str) -> str:
+    """Escape text for safe HTML embedding."""
+    return _html.escape(str(text))
 
 
 def score_gauge_html(score: int, severity: str) -> str:
@@ -64,8 +71,8 @@ def claim_table_html(alignments: list[dict]) -> str:
         badge = label_badge(a.get("label", "uncertain"))
         label = a.get("label", "uncertain").replace("_", " ").title()
         conf = a.get("confidence", 0)
-        text = a.get("claim_text", a.get("claim_id", ""))
-        evidence = a.get("evidence", "")
+        text = _esc(a.get("claim_text", a.get("claim_id", "")))
+        evidence = _esc(a.get("evidence", ""))
         conf_pct = f"{int(conf * 100)}%"
         cls = badge_class.get(a.get("label", ""), "")
 
@@ -111,10 +118,10 @@ def rewrite_suggestions_html(rewrites: list[dict]) -> str:
         parts.append(f'''
         <div class="rtl-rewrite-card">
           <div class="rtl-rewrite-label" style="color:#5f6368;">Original</div>
-          <div style="color:#202124;margin-bottom:8px;">"{rw.get('original', '')}"</div>
+          <div style="color:#202124;margin-bottom:8px;">"{_esc(rw.get('original', ''))}"</div>
           <div class="rtl-rewrite-label" style="color:{label_color};">{label_text}</div>
-          <div class="rtl-rewrite-suggested" style="{suggestion_style}">"{suggested}"</div>
-          <div class="rtl-rewrite-reason">Reason: {rw.get('reason', '')}</div>
+          <div class="rtl-rewrite-suggested" style="{suggestion_style}">"{_esc(suggested)}"</div>
+          <div class="rtl-rewrite-reason">Reason: {_esc(rw.get('reason', ''))}</div>
         </div>''')
 
     return "".join(parts)

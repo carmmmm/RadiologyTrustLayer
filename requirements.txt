@@ -17,5 +17,6 @@ pandas>=2.2.0
 matplotlib>=3.8.0
 jsonschema>=4.22.0
 python-dotenv>=1.0.0
+PyYAML>=6.0
 bcrypt>=4.1.0
 tqdm>=4.66.0

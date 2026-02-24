@@ -56,10 +56,12 @@ def compute_score(claims: list[dict]) -> tuple[int, str, dict]:
 
 
 def severity_color(severity: str) -> str:
+    """Map severity level to a display color name."""
     return {"low": "green", "medium": "orange", "high": "red"}.get(severity, "gray")
 
 
 def label_badge(label: str) -> str:
+    """Return an HTML dot span element color-coded for the given alignment label."""
     dots = {
         "supported": '<span class="rtl-dot rtl-dot-green"></span>',
         "uncertain": '<span class="rtl-dot rtl-dot-amber"></span>',

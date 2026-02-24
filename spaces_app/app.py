@@ -35,11 +35,10 @@ from core.db.db import get_conn, init_db
 from core.db.repo import (
     create_user, authenticate_user, get_user_display_name,
     list_recent_runs_for_user, list_all_runs_for_user,
-    create_run, get_run, list_events_for_run, log_event,
+    create_run, list_events_for_run,
     create_batch, update_batch_progress, link_batch_run,
 )
 from core.audit_trail.events import EventType, log as log_ev
-from core.scoring.score import severity_color
 from core.util.files import write_json, read_json
 from scripts.init_space_storage import ensure_space_storage
 from spaces_app.ui.components import (
@@ -895,10 +894,6 @@ def _set_views(page: str) -> tuple:
     ) + _nav_btn_updates(page) + tuple(
         gr.update(visible=(page == p)) for p in PAGES
     )
-
-
-def _require_login(state: dict) -> bool:
-    return bool(state.get("user_id"))
 
 
 def _after_login_data(state: dict) -> tuple[str, list]:

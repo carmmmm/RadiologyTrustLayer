@@ -22,10 +22,10 @@ Built for the [MedGemma Impact Challenge](https://www.kaggle.com/competitions/me
 |----------|-----|
 | Live Demo | [huggingface.co/spaces/outlawpink/RadiologyTrustLayer](https://huggingface.co/spaces/outlawpink/RadiologyTrustLayer) |
 | LoRA Adapter Weights | [huggingface.co/outlawpink/rtl-medgemma-lora](https://huggingface.co/outlawpink/rtl-medgemma-lora) |
-| Kaggle Notebook |  [https://www.kaggle.com/code/olivecoco/radiology-trust-layer/edit](https://www.kaggle.com/code/olivecoco/radiology-trust-layer/edit) |
-| Video Walkthrough | [(https://www.youtube.com/watch?v=QORtuE8fs1w&t=4s)](https://www.youtube.com/watch?v=QORtuE8fs1w&t=4s) |
+| Kaggle Notebook | [kaggle.com/code/olivecoco/radiology-trust-layer](https://www.kaggle.com/code/olivecoco/radiology-trust-layer) |
+| Video Walkthrough | [youtube.com/watch?v=QORtuE8fs1w](https://www.youtube.com/watch?v=QORtuE8fs1w) |
 | Competition Page | [kaggle.com/competitions/medgemma-impact-challenge](https://www.kaggle.com/competitions/medgemma-impact-challenge) |
-| Write-Up | [https://www.kaggle.com/competitions/med-gemma-impact-challenge/writeups/radiology-trust-layer](https://www.kaggle.com/competitions/med-gemma-impact-challenge/writeups/radiology-trust-layer) |
+| Write-Up | [kaggle.com/competitions/medgemma-impact-challenge](https://www.kaggle.com/competitions/medgemma-impact-challenge) |
 | GitHub Repository | [github.com/carmmmm/RadiologyTrustLayer](https://github.com/carmmmm/RadiologyTrustLayer) |
 
 ---
@@ -49,7 +49,7 @@ Each step uses structured prompts with JSON schema validation to ensure consiste
 
 ## LoRA Training Results
 
-The RTL LoRA adapter was fine-tuned on MedGemma-4B-IT using PEFT (r=4, target modules: q_proj, v_proj) with 8-bit quantization on a Kaggle T4 GPU. Evaluated on 50 synthetic radiology cases:
+The RTL LoRA adapter was fine-tuned on MedGemma-4B-IT using PEFT (r=8, alpha=16, target modules: q_proj, v_proj) with 8-bit quantization on a Kaggle T4 GPU. Evaluated on 50 synthetic radiology cases:
 
 | Metric | Base MedGemma | + RTL LoRA | Delta |
 |--------|:------------:|:----------:|:-----:|
