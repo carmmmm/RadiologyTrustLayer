@@ -4,6 +4,7 @@ Evaluate MedGemma before and after LoRA fine-tuning.
 Metrics:
 - JSON schema valid rate (% of responses that parse as valid JSON matching schema)
 - Overconfidence rate (% of responses with overconfident language)
+- Label value valid rate (% of predicted labels that are in the valid label set)
 - Label accuracy (against ground-truth alignment labels)
 - Schema repair rate (% of responses needing regex repair)
 
@@ -69,6 +70,7 @@ def evaluate_model(model_output_fn, test_cases: list[dict]) -> dict:
     overconfident = 0
     schema_repaired = 0
     label_accs = []
+    all_labels_valid = []
 
     for case in test_cases:
         prompt = case["prompt"]
@@ -94,9 +96,13 @@ def evaluate_model(model_output_fn, test_cases: list[dict]) -> dict:
         if has_overconfident_language(output):
             overconfident += 1
 
-        # Label accuracy
+        # Label value validity and accuracy
         parsed = try_extract_json(output) or {}
         predicted = parsed.get("alignments", [])
+        if predicted:
+            pred_labels = [a.get("label", "") for a in predicted]
+            valid = all(l in LABELS for l in pred_labels)
+            all_labels_valid.append(valid)
         if gt_alignments and predicted:
             label_accs.append(label_accuracy(predicted, gt_alignments))
 
@@ -104,6 +110,7 @@ def evaluate_model(model_output_fn, test_cases: list[dict]) -> dict:
         "n": n,
         "json_valid_rate": json_valid / n,
         "overconfidence_rate": overconfident / n,
+        "label_value_valid_rate": sum(all_labels_valid) / len(all_labels_valid) if all_labels_valid else None,
         "label_accuracy": sum(label_accs) / len(label_accs) if label_accs else None,
         "schema_repair_rate": schema_repaired / n,
     }
@@ -214,7 +221,7 @@ def main():
     print("\n=== Results ===")
     print(f"{'Metric':<30} {'Base':>10} {'LoRA':>10} {'Delta':>10}")
     print("-" * 60)
-    for metric in ["json_valid_rate", "overconfidence_rate", "label_accuracy", "schema_repair_rate"]:
+    for metric in ["json_valid_rate", "overconfidence_rate", "label_value_valid_rate", "label_accuracy", "schema_repair_rate"]:
         b = base_metrics.get(metric)
         l = lora_metrics.get(metric)
         if b is None or l is None:

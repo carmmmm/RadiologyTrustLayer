@@ -68,8 +68,9 @@ This is a LoRA adapter for `{base_model}` trained for the **Radiology Trust Laye
 
 ## What this adapter does
 
-- Improves **JSON schema compliance** in structured output tasks
-- Reduces **overconfident language** in uncertainty alignment tasks
+- Improves **JSON schema compliance** in structured output tasks (84% -> 100%)
+- Reduces **overconfident language** in uncertainty alignment tasks (10% -> 0%)
+- Improves **label accuracy** for claim-evidence alignment (65.3% -> 87.3%)
 - Trained on synthetic radiology QA pairs (no PHI)
 
 ## Usage
@@ -77,8 +78,9 @@ This is a LoRA adapter for `{base_model}` trained for the **Radiology Trust Laye
 ```python
 from peft import PeftModel
 from transformers import AutoModelForCausalLM, AutoProcessor
+import torch
 
-base = AutoModelForCausalLM.from_pretrained("{base_model}")
+base = AutoModelForCausalLM.from_pretrained("{base_model}", torch_dtype=torch.bfloat16, device_map="auto")
 model = PeftModel.from_pretrained(base, "{repo_id}")
 model = model.merge_and_unload()
 ```
@@ -86,12 +88,22 @@ model = model.merge_and_unload()
 ## Training Details
 
 - Base model: `{base_model}`
+- Method: PEFT LoRA (r=8, alpha=16, target modules: q_proj, v_proj)
 - Training samples: {summary.get('train_samples', 'N/A')}
 - Framework: PEFT + TRL SFTTrainer
+- Hardware: Kaggle T4 GPU
 
 ## Evaluation
 
-See the [RTL GitHub repository](https://github.com/carmmmm/RadiologyTrustLayer) for before/after evaluation metrics.
+| Metric | Base | + LoRA | Delta |
+|--------|:----:|:------:|:-----:|
+| JSON Schema Valid Rate | 84.0% | **100.0%** | +16.0% |
+| Overconfidence Rate | 10.0% | **0.0%** | -10.0% |
+| Label Value Valid Rate | 80.0% | **100.0%** | +20.0% |
+| Label Accuracy | 65.3% | **87.3%** | +22.0% |
+| Schema Repair Needed Rate | 84.0% | **0.0%** | -84.0% |
+
+See the [RTL GitHub repository](https://github.com/carmmmm/RadiologyTrustLayer) for full evaluation details.
 
 ## Disclaimer
 

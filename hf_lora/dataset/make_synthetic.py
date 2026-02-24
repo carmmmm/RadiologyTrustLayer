@@ -60,7 +60,7 @@ def make_alignment_example(n_claims: int = 4) -> dict:
     claim_map = {c["claim_id"]: c for c in claims}
     alignments = []
     for claim in claims:
-        label = random.choices(LABELS, weights=[0.5, 0.25, 0.15, 0.1])[0]
+        label = random.choices(LABELS, weights=[0.5, 0.3, 0.2])[0]
         alignments.append({
             "claim_id": claim["claim_id"],
             "label": label,
