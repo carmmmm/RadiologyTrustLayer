@@ -11,10 +11,10 @@ Built for the [MedGemma Impact Challenge](https://www.kaggle.com/competitions/me
 |----------|-----|
 | Live Demo | [huggingface.co/spaces/outlawpink/RadiologyTrustLayer](https://huggingface.co/spaces/outlawpink/RadiologyTrustLayer) |
 | LoRA Adapter Weights | [huggingface.co/outlawpink/rtl-medgemma-lora](https://huggingface.co/outlawpink/rtl-medgemma-lora) |
-| Kaggle Notebook | [ [https://www.kaggle.com/code/olivecoco/radiology-trust-layer/edit](https://www.kaggle.com/code/olivecoco/radiology-trust-layer/edit) |
-| Video Walkthrough | [PLACEHOLDER — update with YouTube URL] |
+| Kaggle Notebook |  [https://www.kaggle.com/code/olivecoco/radiology-trust-layer/edit](https://www.kaggle.com/code/olivecoco/radiology-trust-layer/edit) |
+| Video Walkthrough | [[PLACEHOLDER — update with YouTube URL]](https://www.youtube.com/watch?v=QORtuE8fs1w&t=4s) |
 | Competition Page | [kaggle.com/competitions/medgemma-impact-challenge](https://www.kaggle.com/competitions/medgemma-impact-challenge) |
-| Write-Up | [PLACEHOLDER — update with write-up URL] |
+| Write-Up | [PLACEHOLDER — update with write-up URL]](https://www.kaggle.com/competitions/med-gemma-impact-challenge/writeups/radiology-trust-layer) |
 | GitHub Repository | [github.com/carmmmm/RadiologyTrustLayer](https://github.com/carmmmm/RadiologyTrustLayer) |
 
 ---
