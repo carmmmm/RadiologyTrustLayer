@@ -1,4 +1,13 @@
-"""Compute 0-100 safety score and severity label from alignment results."""
+"""
+Safety score computation for radiology report audits.
+
+Computes a 0-100 score from alignment labels using a penalty-based system:
+  - Supported claims: no penalty
+  - Uncertain claims: partial penalty (8 points)
+  - Needs review claims: full penalty (25 points)
+
+Severity classification: low (>= 80), medium (>= 50), high (< 50).
+"""
 from typing import Literal
 
 Label = Literal["supported", "uncertain", "needs_review"]

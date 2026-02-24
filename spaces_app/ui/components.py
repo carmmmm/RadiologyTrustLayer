@@ -1,8 +1,15 @@
-"""Reusable Gradio UI blocks — Google-style design system."""
+"""
+Reusable HTML components for the Radiology Trust Layer UI.
+
+Provides rendering functions for the score gauge, flag counts,
+claim analysis table, and rewrite suggestion cards. All components
+follow the RTL design system (Google-inspired Material style).
+"""
 from core.scoring.score import label_badge
 
 
 def score_gauge_html(score: int, severity: str) -> str:
+    """Render the circular safety score gauge with severity chip and progress bar."""
     color_map = {"low": "#34a853", "medium": "#fbbc04", "high": "#ea4335"}
     sev_bg = {"low": "#e6f4ea", "medium": "#fef7e0", "high": "#fce8e6"}
     sev_fg = {"low": "#137333", "medium": "#b06000", "high": "#c5221f"}
@@ -22,6 +29,7 @@ def score_gauge_html(score: int, severity: str) -> str:
 
 
 def flag_counts_html(flag_counts: dict) -> str:
+    """Render the label distribution summary (supported/uncertain/needs_review counts)."""
     items = [
         ("supported", "Supported", "#34a853", "rtl-dot-green"),
         ("uncertain", "Uncertain", "#fbbc04", "rtl-dot-amber"),
@@ -41,6 +49,7 @@ def flag_counts_html(flag_counts: dict) -> str:
 
 
 def claim_table_html(alignments: list[dict]) -> str:
+    """Render the claim analysis table with label badges, confidence, and evidence."""
     if not alignments:
         return "<p style='color:#5f6368;'>No claims found.</p>"
 
@@ -83,6 +92,7 @@ def claim_table_html(alignments: list[dict]) -> str:
 
 
 def rewrite_suggestions_html(rewrites: list[dict]) -> str:
+    """Render rewrite suggestion cards. Needs-review items show 'verify' actions; uncertain items show rewrites."""
     if not rewrites:
         return '<p style="color:#34a853;">No rewrites suggested — all claims are well-calibrated.</p>'
 

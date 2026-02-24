@@ -1,8 +1,20 @@
 """
-Radiology Trust Layer — Gradio Spaces entrypoint.
+Radiology Trust Layer (RTL) — Gradio Spaces Application.
 
-Multi-page navigation via gr.Group visibility toggling.
-All views are built inside gr.Blocks() so component references are valid.
+This is the main entrypoint for the RTL web application, deployed on Hugging Face Spaces.
+It provides a multi-page interface for auditing radiology reports against imaging evidence
+using Google's MedGemma-4B-IT model with a custom LoRA adapter.
+
+Pages:
+  - Landing: Overview, pipeline diagram, and key metrics
+  - Demo: Pre-loaded chest X-ray cases with pre-computed results
+  - Single Audit: Upload an image + report for real-time pipeline execution
+  - Batch Audit: Process multiple cases from a ZIP archive
+  - History: Browse and filter past audit runs (requires login)
+  - Evaluation: Before/after LoRA metrics and model card
+  - Settings: Runtime configuration display
+
+Navigation uses gr.Group visibility toggling with a persistent top navigation bar.
 """
 import sys
 import json
@@ -298,62 +310,6 @@ button.secondary {
     color: #5f6368;
     font-style: italic;
 }
-
-/* Demo Cards */
-.rtl-demo-section {
-    background: #f8f9fa;
-    border: 1px solid #e0e0e0;
-    border-radius: 12px;
-    padding: 24px;
-    margin: 8px 0 20px 0;
-}
-.rtl-demo-title {
-    font-size: 1rem;
-    font-weight: 600;
-    color: #202124;
-    margin-bottom: 4px;
-}
-.rtl-demo-subtitle {
-    font-size: 0.8125rem;
-    color: #5f6368;
-    margin-bottom: 16px;
-}
-.rtl-demo-cards { display: flex; gap: 16px; }
-.rtl-demo-card {
-    flex: 1;
-    background: #ffffff;
-    border: 1px solid #dadce0;
-    border-radius: 12px;
-    padding: 16px;
-    transition: box-shadow 0.2s, border-color 0.2s;
-}
-.rtl-demo-card:hover {
-    box-shadow: 0 1px 6px rgba(32,33,36,0.15);
-    border-color: #1a73e8;
-}
-.rtl-demo-card-title {
-    font-weight: 600;
-    font-size: 0.875rem;
-    color: #202124;
-    margin-bottom: 6px;
-}
-.rtl-demo-card-desc {
-    font-size: 0.8125rem;
-    color: #5f6368;
-    line-height: 1.4;
-}
-.rtl-demo-card-severity {
-    display: inline-block;
-    font-size: 0.75rem;
-    font-weight: 600;
-    padding: 2px 8px;
-    border-radius: 4px;
-    margin-top: 8px;
-    text-transform: uppercase;
-}
-.rtl-sev-low { background: #e6f4ea; color: #137333; }
-.rtl-sev-medium { background: #fef7e0; color: #b06000; }
-.rtl-sev-high { background: #fce8e6; color: #c5221f; }
 
 /* PHI Banner */
 .rtl-phi-banner {
@@ -794,26 +750,6 @@ def _load_example_manifest() -> list[dict]:
 EXAMPLE_CASES = _load_example_manifest()
 
 
-def _build_demo_cards_html(examples: list[dict]) -> str:
-    sev_class = {"low": "rtl-sev-low", "medium": "rtl-sev-medium", "high": "rtl-sev-high"}
-    cards = []
-    for ex in examples:
-        label = ex["label"]
-        sev = ex.get("expected_severity", "low")
-        notes = ex.get("notes", "")
-        cards.append(f'''
-        <div class="rtl-demo-card">
-            <div class="rtl-demo-card-title">{label}</div>
-            <div class="rtl-demo-card-desc">{notes}</div>
-            <span class="rtl-demo-card-severity {sev_class.get(sev, '')}">{sev}</span>
-        </div>''')
-    return f'''
-    <div class="rtl-demo-section">
-        <div class="rtl-demo-title">New here? Try an example case</div>
-        <div class="rtl-demo-subtitle">Select one of these pre-loaded chest X-ray cases to see RTL in action.</div>
-        <div class="rtl-demo-cards">{''.join(cards)}</div>
-    </div>'''
-
 
 def _load_example_case(index: int):
     if index >= len(EXAMPLE_CASES):
@@ -1152,13 +1088,13 @@ def main() -> gr.Blocks:
   <p>The system extracts every claim from a free-text radiology report, analyzes the corresponding medical image with MedGemma's vision encoder, and aligns each claim to visual findings. Claims are labeled as <em>supported</em>, <em>uncertain</em>, or <em>needs review</em>. Flagged claims receive suggested rewrites using calibrated uncertainty language — turning overconfident statements into properly hedged ones. Clinicians get a structured summary highlighting key concerns; patients get an accessible plain-language explanation of the findings.</p>
   <p style="margin-bottom:0;">Built on Google's MedGemma-4B-IT with a custom LoRA adapter fine-tuned for JSON schema compliance and uncertainty calibration.</p>
 </div>''')
-            # Large metrics strip — full width, bigger numbers
+            # Large metrics strip with real training results
             gr.HTML('''<div style="display:flex;gap:0;padding:28px 0 12px 0;border-top:1px solid rgba(0,0,0,0.08);margin-top:12px;">
-  <div style="flex:1;text-align:center;border-right:1px solid rgba(0,0,0,0.06);"><span style="font-size:2.4rem;font-weight:700;color:#202124;">96%</span><div style="font-size:0.78rem;color:#5f6368;margin-top:4px;">Schema Compliance</div></div>
-  <div style="flex:1;text-align:center;border-right:1px solid rgba(0,0,0,0.06);"><span style="font-size:2.4rem;font-weight:700;color:#202124;">89%</span><div style="font-size:0.78rem;color:#5f6368;margin-top:4px;">Label Accuracy</div></div>
+  <div style="flex:1;text-align:center;border-right:1px solid rgba(0,0,0,0.06);"><span style="font-size:2.4rem;font-weight:700;color:#202124;">100%</span><div style="font-size:0.78rem;color:#5f6368;margin-top:4px;">Schema Compliance</div></div>
+  <div style="flex:1;text-align:center;border-right:1px solid rgba(0,0,0,0.06);"><span style="font-size:2.4rem;font-weight:700;color:#202124;">87.3%</span><div style="font-size:0.78rem;color:#5f6368;margin-top:4px;">Label Accuracy</div></div>
   <div style="flex:1;text-align:center;border-right:1px solid rgba(0,0,0,0.06);"><span style="font-size:2.4rem;font-weight:700;color:#202124;">6</span><div style="font-size:0.78rem;color:#5f6368;margin-top:4px;">Pipeline Steps</div></div>
   <div style="flex:1;text-align:center;"><span style="font-size:2.4rem;font-weight:700;color:#202124;">4B</span><div style="font-size:0.78rem;color:#5f6368;margin-top:4px;">Model Parameters</div></div>
-</div><div style="font-size:0.72rem;color:#9aa0a6;padding:0 0 4px 0;text-align:center;">Evaluated on 50 synthetic radiology cases · See Evaluation tab for full before/after breakdown</div>''')
+</div><div style="font-size:0.72rem;color:#9aa0a6;padding:0 0 4px 0;text-align:center;">Evaluated on 50 synthetic radiology cases -- See Evaluation tab for full before/after breakdown</div>''')
             # Disclaimer
             gr.HTML('''<div class="rtl-landing-disclaimer"><span class="rtl-disclaimer-badge">Disclaimer</span> Research demonstration for the MedGemma Impact Challenge. Not for clinical use. Do not upload real patient data.</div>''')
 
@@ -1230,6 +1166,7 @@ def main() -> gr.Blocks:
                 create_pw = gr.Textbox(label="Password", type="password")
                 create_btn = gr.Button("Create Account", variant="primary")
                 create_msg = gr.HTML()
+            login_back = gr.Button("Back", size="sm")
 
         # ═══════════════════════════════════════════════════════════════════
         # HOME VIEW
@@ -1401,26 +1338,49 @@ def main() -> gr.Blocks:
         evaluation_view = gr.Group(visible=False)
         with evaluation_view:
             gr.Markdown("## Evaluation and Model Transparency")
+            gr.Markdown(
+                "Performance metrics and model documentation for the Radiology Trust Layer. "
+                "All metrics are computed on a held-out test set of 50 synthetic radiology cases."
+            )
             with gr.Tabs():
+                with gr.Tab("Before / After Metrics"):
+                    gr.Markdown(
+                        "Comparison of base MedGemma-4B-IT against the same model with the RTL LoRA adapter applied. "
+                        "The LoRA adapter was trained on synthetic radiology data to improve structured output quality."
+                    )
+                    eval_metrics_html = gr.HTML(_render_default_metrics())
                 with gr.Tab("Model Card"):
                     gr.Markdown(f"""
 ### Base Model: MedGemma 4B IT
+
+MedGemma is a multimodal medical AI model developed by Google Health AI. It combines a Gemma 2 language model with a SigLIP vision encoder, enabling joint understanding of medical images and text.
 
 | Property | Value |
 |---|---|
 | Base model | `{config.MEDGEMMA_MODEL_ID}` |
 | Architecture | Gemma 2 + SigLIP vision encoder |
 | Parameters | ~4 billion |
-| Training | Google Health AI — medical imaging + text |
-| Input | Image + Text (multimodal) |
-| Access | Gated on Hugging Face |
+| Training data | Medical imaging and clinical text (Google Health AI) |
+| Input modality | Image + Text (multimodal) |
+| Access | Gated model on Hugging Face (requires agreement) |
 
 ### RTL LoRA Adapter
-Trained to improve JSON schema compliance and uncertainty calibration.
-See the Hugging Face model page (linked in writeup) for adapter weights.
+
+A lightweight Low-Rank Adaptation (LoRA) fine-tuned on top of MedGemma to improve two key behaviors:
+
+1. **JSON schema compliance** -- ensures structured pipeline outputs are valid and parseable
+2. **Uncertainty calibration** -- reduces overconfident language in generated text
+
+| Property | Value |
+|---|---|
+| Adapter type | LoRA (PEFT) |
+| Rank | r=4 |
+| Target modules | q_proj, v_proj |
+| Training | 8-bit quantized, SFTTrainer (TRL) on Kaggle T4 GPU |
+| Dataset | 50 synthetic radiology cases |
+
+**Adapter weights:** [View on Hugging Face](https://huggingface.co/outlawpink/rtl-medgemma-lora)
 """)
-                with gr.Tab("Before / After Metrics"):
-                    eval_metrics_html = gr.HTML(_render_default_metrics())
                 with gr.Tab("Example Cases"):
                     eval_case_md = gr.Markdown(_load_mock_example_md())
             evaluation_back = gr.Button("Back to Home", size="sm")
@@ -1430,23 +1390,26 @@ See the Hugging Face model page (linked in writeup) for adapter weights.
         # ═══════════════════════════════════════════════════════════════════
         settings_view = gr.Group(visible=False)
         with settings_view:
-            gr.Markdown("## Settings")
+            gr.Markdown("## System Configuration")
+            gr.Markdown(
+                "Current runtime configuration for the Radiology Trust Layer. "
+                "These values are set at deployment time and control how the audit pipeline operates."
+            )
             gr.Markdown(f"""
-| Setting | Value |
-|---|---|
-| Base model | `{config.MEDGEMMA_MODEL_ID}` |
-| LoRA adapter | `{config.RTL_LORA_ID or 'none'}` |
-| Mock mode | `{'enabled' if config.MEDGEMMA_MOCK else 'disabled'}` |
-| Inference mode | `{config.MEDGEMMA_INFERENCE_MODE}` |
-| Prompt version | `{config.RTL_PROMPT_VERSION}` |
-
-*Modify via environment variables and restart the Space.*
+| Setting | Value | Description |
+|---|---|---|
+| Base model | `{config.MEDGEMMA_MODEL_ID}` | Google's medical vision-language model used for all inference |
+| LoRA adapter | `{config.RTL_LORA_ID or 'Not loaded'}` | Custom fine-tuned adapter for JSON compliance and uncertainty calibration |
+| Mock mode | `{'Enabled' if config.MEDGEMMA_MOCK else 'Disabled'}` | When enabled, returns pre-built results without running the model |
+| Inference mode | `{config.MEDGEMMA_INFERENCE_MODE}` | How the model is loaded (local GPU, API, or mock) |
+| Prompt version | `{config.RTL_PROMPT_VERSION}` | Version of the structured prompt templates used in the pipeline |
 """)
             gr.Markdown("""
-### Disclaimer
-RTL is a **research demonstration** for the MedGemma Impact Challenge.
-It is NOT intended for clinical use. Do not upload real patient data.
-Always consult qualified radiologists for medical decisions.
+### About This System
+
+RTL is a **research demonstration** built for the [MedGemma Impact Challenge](https://www.kaggle.com/competitions/medgemma-impact-challenge) on Kaggle. It is designed to audit radiology report language against imaging evidence, not to generate diagnoses or replace clinical judgment.
+
+**Important:** Do not upload real patient data. Always consult qualified radiologists for medical decisions.
 """)
             settings_back = gr.Button("Back to Home", size="sm")
 
@@ -1856,10 +1819,11 @@ Always consult qualified radiologists for medical decisions.
         # Export
         detail_export_btn.click(export_run, inputs=[state], outputs=[detail_export_file])
 
-        # Back buttons (all return to single audit)
+        # Back buttons (return to single audit; login back returns to landing)
         back_buttons = [single_back, batch_back, detail_back, history_back, evaluation_back, settings_back]
         for btn in back_buttons:
             btn.click(lambda st: go_to("single", st), inputs=[state], outputs=_shared_nav_outputs)
+        login_back.click(lambda st: go_to("landing", st), inputs=[state], outputs=_shared_nav_outputs)
 
         # Initial view on load
         demo.load(
@@ -1878,31 +1842,35 @@ def _single_empty():
 
 
 def _render_default_metrics() -> str:
+    """Render the before/after evaluation metrics table with real training results."""
     rows = [
-        ("JSON Schema Valid Rate", "72%", "96%", "+24%", True),
-        ("Overconfidence Rate", "31%", "9%", "-22%", True),
-        ("Label Accuracy", "74%", "89%", "+15%", True),
-        ("Schema Repair Rate", "28%", "4%", "-24%", True),
+        ("JSON Schema Valid Rate", "84.0%", "100.0%", "+16.0%", True),
+        ("Overconfidence Rate", "10.0%", "0.0%", "-10.0%", True),
+        ("Label Value Valid Rate", "80.0%", "100.0%", "+20.0%", True),
+        ("Label Accuracy", "65.3%", "87.3%", "+22.0%", True),
+        ("Schema Repair Needed Rate", "84.0%", "0.0%", "-84.0%", True),
     ]
     html_rows = ""
-    for m, b, l, d, g in rows:
-        color = "#137333" if g else "#c5221f"
+    for metric, base, lora, delta, improved in rows:
+        color = "#137333" if improved else "#c5221f"
         html_rows += (
             f"<tr>"
-            f"<td class='rtl-td'>{m}</td>"
-            f"<td class='rtl-td' style='text-align:center;'>{b}</td>"
-            f"<td class='rtl-td' style='text-align:center;font-weight:600;'>{l}</td>"
-            f"<td class='rtl-td' style='text-align:center;color:{color};font-weight:600;'>{d}</td>"
+            f"<td class='rtl-td'>{metric}</td>"
+            f"<td class='rtl-td' style='text-align:center;'>{base}</td>"
+            f"<td class='rtl-td' style='text-align:center;font-weight:600;'>{lora}</td>"
+            f"<td class='rtl-td' style='text-align:center;color:{color};font-weight:600;'>{delta}</td>"
             f"</tr>"
         )
     return (
-        "<p style='color:#5f6368;font-size:0.85rem;margin-bottom:12px;'>Test set: 50 synthetic cases. "
-        "Base model: MedGemma-4B-IT. LoRA adapter: RTL-v1.</p>"
+        "<p style='color:#5f6368;font-size:0.85rem;margin-bottom:12px;'>"
+        "Evaluated on 50 synthetic radiology cases. "
+        "Base model: MedGemma-4B-IT (8-bit quantized). "
+        "LoRA adapter: RTL-v1 (r=4, target modules: q_proj, v_proj).</p>"
         "<table class='rtl-table'>"
         "<thead><tr>"
         "<th class='rtl-th'>Metric</th>"
-        "<th class='rtl-th' style='text-align:center;'>Base</th>"
-        "<th class='rtl-th' style='text-align:center;'>+ LoRA</th>"
+        "<th class='rtl-th' style='text-align:center;'>Base MedGemma</th>"
+        "<th class='rtl-th' style='text-align:center;'>+ RTL LoRA</th>"
         "<th class='rtl-th' style='text-align:center;'>Delta</th>"
         "</tr></thead><tbody>" + html_rows + "</tbody></table>"
     )

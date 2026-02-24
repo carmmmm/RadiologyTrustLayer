@@ -5,7 +5,6 @@ Validates that all components are wired up correctly.
 Usage:
   MEDGEMMA_MOCK=true python scripts/smoke_test.py
 """
-import json
 import sys
 import os
 from pathlib import Path
@@ -55,12 +54,11 @@ def test_pipeline():
     assert "edited_report" in result, "Missing edited_report"
     assert len(steps_logged) == 6, f"Expected 6 progress steps, got {len(steps_logged)}"
 
-    print(f"\n✅ Pipeline OK — Score: {result['overall_score']}/100, Severity: {result['severity']}")
+    print(f"\nPASS: Pipeline OK — Score: {result['overall_score']}/100, Severity: {result['severity']}")
     return result
 
 
 def test_database():
-    from core import config
     from core.db.db import get_conn, init_db
     from core.db.repo import create_user, authenticate_user, create_run, list_recent_runs_for_user
 
@@ -99,7 +97,7 @@ def test_database():
         rows = list_recent_runs_for_user(conn, uid)
         assert len(rows) == 1, f"Expected 1 run, got {len(rows)}"
 
-    print("✅ Database OK")
+    print("PASS: Database OK")
 
 
 def test_scoring():
@@ -124,11 +122,11 @@ def test_scoring():
     assert score2 == 100, f"Expected 100, got {score2}"
     assert sev2 == "low"
 
-    print("✅ Scoring OK")
+    print("PASS: Scoring OK")
 
 
 def test_validation():
-    from core.util.validation import extract_json_from_text, validate, load_schema
+    from core.util.validation import extract_json_from_text
 
     # Test extraction
     text = 'Some text {"key": "value", "num": 42} more text'
@@ -140,7 +138,7 @@ def test_validation():
     result2 = extract_json_from_text(text2)
     assert result2 == {"claims": []}, f"Wrong result: {result2}"
 
-    print("✅ Validation OK")
+    print("PASS: Validation OK")
 
 
 if __name__ == "__main__":
@@ -153,9 +151,9 @@ if __name__ == "__main__":
         test_validation()
         test_database()
         test_pipeline()
-        print("\n🎉 All smoke tests passed!")
+        print("\nAll smoke tests passed.")
     except Exception as e:
-        print(f"\n❌ Smoke test FAILED: {e}")
+        print(f"\nFAIL: Smoke test FAILED: {e}")
         import traceback
         traceback.print_exc()
         sys.exit(1)

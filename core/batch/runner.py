@@ -1,4 +1,10 @@
-"""Sequential batch runner: runs audit_pipeline on each case and persists batch results."""
+"""
+Sequential batch audit runner.
+
+Processes a ZIP archive of radiology cases by running the full 6-step audit
+pipeline on each case. Collects per-case results and computes batch-level
+summary statistics (average score, severity distribution, failure rate).
+"""
 import logging
 from pathlib import Path
 from typing import Callable, Optional

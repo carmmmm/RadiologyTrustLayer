@@ -1,4 +1,14 @@
-"""Central configuration loaded from environment variables / .env file."""
+"""
+Central configuration for the Radiology Trust Layer.
+
+All settings are loaded from environment variables (or a .env file via python-dotenv).
+Key variables:
+  - MEDGEMMA_MODEL_ID: Base model (default: google/medgemma-4b-it)
+  - RTL_LORA_ID: HF repo ID of the LoRA adapter (optional)
+  - MEDGEMMA_MOCK: Enable mock mode for development (default: false)
+  - MEDGEMMA_INFERENCE_MODE: local, api, or mock (default: local)
+  - HF_TOKEN: Hugging Face token for gated model access
+"""
 import os
 from pathlib import Path
 from dotenv import load_dotenv

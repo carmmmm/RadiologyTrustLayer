@@ -1,4 +1,10 @@
-"""JSON schema validation and repair helpers."""
+"""
+JSON schema validation and text extraction helpers.
+
+Provides functions to validate structured outputs against JSON schemas
+and extract JSON objects from free-text model responses (handles markdown
+code fences, embedded JSON, and raw JSON strings).
+"""
 import json
 import re
 import jsonschema

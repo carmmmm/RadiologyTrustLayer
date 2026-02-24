@@ -1,4 +1,13 @@
-"""Render a radiology report with sentence-level color highlighting."""
+"""
+Render a radiology report with sentence-level color highlighting.
+
+Each claim in the report is highlighted according to its alignment label:
+  - Green: supported by imaging evidence
+  - Yellow: uncertain (insufficient visual evidence)
+  - Red: needs clinical review (possible mismatch)
+
+Highlights are positioned using character-level spans from claim extraction.
+"""
 import html
 
 
