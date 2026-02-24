@@ -1,14 +1,3 @@
----
-title: Radiology Trust Layer
-emoji: 🩻
-colorFrom: blue
-colorTo: indigo
-sdk: gradio
-sdk_version: "5.31.0"
-python_version: "3.11"
-app_file: spaces_app/app.py
-pinned: false
----
 
 # Radiology Trust Layer (RTL)
 
@@ -22,7 +11,7 @@ Built for the [MedGemma Impact Challenge](https://www.kaggle.com/competitions/me
 |----------|-----|
 | Live Demo | [huggingface.co/spaces/outlawpink/RadiologyTrustLayer](https://huggingface.co/spaces/outlawpink/RadiologyTrustLayer) |
 | LoRA Adapter Weights | [huggingface.co/outlawpink/rtl-medgemma-lora](https://huggingface.co/outlawpink/rtl-medgemma-lora) |
-| Kaggle Notebook | [PLACEHOLDER — update with notebook URL] |
+| Kaggle Notebook | [ [https://www.kaggle.com/code/olivecoco/radiology-trust-layer/edit](https://www.kaggle.com/code/olivecoco/radiology-trust-layer/edit) |
 | Video Walkthrough | [PLACEHOLDER — update with YouTube URL] |
 | Competition Page | [kaggle.com/competitions/medgemma-impact-challenge](https://www.kaggle.com/competitions/medgemma-impact-challenge) |
 | Write-Up | [PLACEHOLDER — update with write-up URL] |
