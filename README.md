@@ -1,3 +1,14 @@
+---
+title: Radiology Trust Layer
+emoji: 🩻
+colorFrom: blue
+colorTo: indigo
+sdk: gradio
+sdk_version: "5.31.0"
+python_version: "3.11"
+app_file: spaces_app/app.py
+pinned: false
+---
 
 # Radiology Trust Layer (RTL)
 
